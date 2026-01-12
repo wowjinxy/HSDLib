@@ -87,7 +87,8 @@ namespace HSDRawViewer.GUI.Controls
             Joint,
             Texture,
             Material,
-            Light
+            Light,
+            Fog,
         }
 
         public class GraphDisplayOptions
@@ -425,6 +426,9 @@ namespace HSDRawViewer.GUI.Controls
                 case AnimType.Light:
                     tt = typeof(LightTrackType);
                     break;
+                case AnimType.Fog:
+                    tt = typeof(FogTrackType);
+                    break;
                 default:
                     tt = typeof(JointTrackType);
                     break;
@@ -457,6 +461,8 @@ namespace HSDRawViewer.GUI.Controls
                     return ((TexTrackType)type).ToString();
                 case AnimType.Light:
                     return ((LightTrackType)type).ToString();
+                case AnimType.Fog:
+                    return ((FogTrackType)type).ToString();
                 default:
                     return "Type_" + type;
             }

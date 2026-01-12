@@ -5,6 +5,7 @@ using HSDRawViewer.Rendering.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRawViewer.Tools
 {
@@ -177,6 +178,18 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static KAR_grCollisionTree GeneratePartition(LiveJObj model, KAR_grCollisionNode coll)
         {
+            var bones = model.Enumerate.Select(e => e.WorldTransform).ToArray();
+            return GeneratePartition(bones, coll);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="coll"></param>
+        /// <returns></returns>
+        public static KAR_grCollisionTree GeneratePartition(Matrix4[] bones, KAR_grCollisionNode coll)
+        {
             HSDRaw.GX.GXVector3[] _vertices = coll.Vertices;
             KAR_CollisionTriangle[] _triangles = coll.Triangles;
             KAR_CollisionJoint[] _joints = coll.Joints;
@@ -185,7 +198,7 @@ namespace HSDRawViewer.Tools
             List<SpatialTriangle> triangles = new();
             foreach (KAR_CollisionJoint j in _joints)
             {
-                Matrix4 trans = model == null ? Matrix4.Identity : model.GetJObjAtIndex(j.BoneID).WorldTransform;
+                Matrix4 trans = bones[j.BoneID];
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     KAR_CollisionTriangle tri = _triangles[i];
@@ -229,7 +242,7 @@ namespace HSDRawViewer.Tools
                 foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
                     List<SpatialTriangle> zt = new();
-                    Matrix4 trans = model == null ? Matrix4.Identity : model.GetJObjAtIndex(j.BoneID).WorldTransform;
+                    Matrix4 trans = bones[j.BoneID];
 
                     for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                     {

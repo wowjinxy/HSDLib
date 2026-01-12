@@ -4,10 +4,12 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace HSDRawViewer.IO.Model
+namespace HSDRawViewer.IO
 {
-    public static class HsdJsonHelper
+    public static class JsonHelper
     {
+        internal static readonly string FileFilter = @"JSON (*.json)|*.json;";
+
         private static JsonSerializerOptions _settings = new JsonSerializerOptions()
         {
             AllowTrailingCommas = true,

@@ -4,6 +4,7 @@ using HSDRaw.GX;
 using HSDRaw.Tools;
 using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.IO;
 using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
@@ -111,7 +112,7 @@ namespace HSDRawViewer.Converters
                             }
                         }
                     }
-                    HsdJsonHelper.Export(f, skl);
+                    JsonHelper.Export(f, skl);
                 }
                 else
                 {

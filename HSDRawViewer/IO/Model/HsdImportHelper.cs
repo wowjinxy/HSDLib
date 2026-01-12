@@ -86,7 +86,7 @@ namespace HSDRawViewer.IO.Model
         /// <returns></returns>
         public static HSD_JOBJ ImportSklToJObj(string filePath)
         {
-            var skl = HsdJsonHelper.Import<HsdSkl>(filePath);
+            var skl = JsonHelper.Import<HsdSkl>(filePath);
             var dir = Path.GetDirectoryName(filePath);
             HsdImportHelper hlp = new HsdImportHelper(dir, skl);
             hlp.Save();

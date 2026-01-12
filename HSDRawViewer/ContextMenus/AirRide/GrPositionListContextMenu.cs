@@ -65,8 +65,8 @@ namespace HSDRawViewer.ContextMenus.AirRide
                 int i = 0;
                 foreach (KAR_grPositionData p in data.PositionData.Array)
                 {
-                    Quaternion rot = new Matrix3(p.M11, p.M12, p.M13,
-                        p.M21, p.M22, p.M23,
+                    Quaternion rot = new Matrix3(p.FX, p.FY, p.FZ,
+                        p.UX, p.UY, p.UZ,
                         0, 0, 1).ExtractRotation();
 
                     IOBone bone = new()
@@ -96,12 +96,12 @@ namespace HSDRawViewer.ContextMenus.AirRide
                     X = bone.TranslationX,
                     Y = bone.TranslationY,
                     Z = bone.TranslationZ,
-                    M11 = rot.M11,
-                    M12 = rot.M12,
-                    M13 = rot.M13,
-                    M21 = rot.M21,
-                    M22 = rot.M22,
-                    M23 = rot.M23,
+                    FX = rot.M11,
+                    FY = rot.M12,
+                    FZ = rot.M13,
+                    UX = rot.M21,
+                    UY = rot.M22,
+                    UZ = rot.M23,
                 });
             }
 

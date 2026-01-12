@@ -14,7 +14,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
         public GrSplineEditor(KAR_grSplineList splineList)
         {
             _list = splineList;
-            _items = splineList.Splines;
+            _items = splineList.Splines.Array;
         }
 
         public void Render(object selected)
@@ -32,7 +32,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
         {
             if (_items != null && _items.Length > 0)
             {
-                _list.Splines = _items;
+                _list.Splines.Array = _items;
             }
             else
             {

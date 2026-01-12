@@ -1,4 +1,6 @@
 ﻿using HSDRaw.Common.Animation;
+using HSDRawViewer.IO;
+using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools.Animation;
 using IONET;
@@ -10,7 +12,7 @@ namespace HSDRawViewer.Converters.Animation
 {
     public class JointAnimationLoader
     {
-        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd*.dae)|*.dat;*.anim;*.chr0;*.smd;*.dae;";
+        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd*.dae*.hsda)|*.dat;*.anim;*.chr0;*.smd;*.dae;*.hsda";
 
         /// <summary>
         /// 
@@ -25,6 +27,13 @@ namespace HSDRawViewer.Converters.Animation
 
             if (filePath != null)
             {
+                if (Path.GetExtension(filePath).ToLower().Equals(".hsda"))
+                {
+                    var a = new JointAnimManager();
+                    a.FromFigaTree(HsdAnim.ToFigaTree(JsonHelper.Import<HsdAnim>(filePath)));
+                    return a;
+                }
+                else
                 if (Path.GetExtension(filePath).ToLower().Equals(".smd"))
                 {
                     return SMDConv.ImportAnimationFromSMD(filePath, _jointMap);

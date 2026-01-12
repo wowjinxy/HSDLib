@@ -1,7 +1,7 @@
-﻿using HSDRaw;
-using HSDRaw.AirRide.Gr;
-using HSDRaw.AirRide.Gr.Data;
-using HSDRawViewer.Converters.AirRide;
+﻿using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.Converters;
+using HSDRawViewer.IO;
+using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
@@ -22,12 +22,11 @@ namespace HSDRawViewer.ContextMenus.AirRide
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    string f = FileIO.OpenFile("KAR Collision (*.kdt)|*.kdt", "collision.kdt");
+                    string f = FileIO.OpenFile(JsonHelper.FileFilter);
                     if (f != null)
                     {
-                        FormatKDT.ReadKDT(f, out var node, out var tree);
-                        data.CollisionNode = node;
-                        data.PartitionNode.Partition = tree;
+                        var kd = KdFile.OpenKdFile(f);
+                        kd.ImportIntoNode(data);
                     }
                 }
             };
@@ -38,15 +37,27 @@ namespace HSDRawViewer.ContextMenus.AirRide
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    string f = FileIO.SaveFile("KAR Collision (*.kdt)|*.kdt", "collision.kdt");
+                    string f = FileIO.SaveFile("", "map");
                     if (f != null)
                     {
-                        FormatKDT.WriteKDT(f, data.CollisionNode);
+                        var kd = new KdFile(data);
+                        kd.Save(f);
                     }
                 }
             };
             Items.Add(exportKdt);
 
+
+            ToolStripMenuItem recal = new("Recalculate Partition");
+            recal.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    HSDRaw.Common.HSD_JOBJ jobj = ModelImporter.ImportModelFromFile(null);
+                    data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
+                }
+            };
+            Items.Add(recal);
 
 
             ToolStripMenuItem ImportCollModel = new("Import Collision Model");

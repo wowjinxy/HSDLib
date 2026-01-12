@@ -24,6 +24,8 @@ namespace HSDRawViewer.GUI.Plugins
                         type = GraphEditor.AnimType.Texture;
                     if (par.Accessor is HSD_LightAnimPointer)
                         type = GraphEditor.AnimType.Light;
+                    if (par.Accessor is HSD_FogAnim)
+                        type = GraphEditor.AnimType.Fog;
                 }
 
                 if (value.Accessor is HSD_AOBJ aobj)

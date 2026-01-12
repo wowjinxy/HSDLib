@@ -5,7 +5,10 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
+using YamlDotNet.Core;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -137,6 +140,311 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(anim);
 
+#if DEBUG
+
+            ToolStripMenuItem validate = new("Debug Validate");
+            validate.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
+                {
+                    var p = spline.Points;
+                    var len = spline.Lengths;
+
+                    float total_length = 0;
+                    for (int i = 0; i < p.Length - 1; i++)
+                    {
+                        var a = p[i];
+                        var b = p[i + 1];
+                        var dis = Vector3.Distance(
+                                new Vector3(a.X, a.Y, a.Z),
+                                new Vector3(b.X, b.Y, b.Z));
+                        total_length += dis;
+                        System.Diagnostics.Debug.WriteLine($"{dis} {total_length}");
+                    }
+
+                    float l = 0;
+                    for (int i = 0; i < p.Length-1; i++)
+                    {
+                        var a = p[i];
+                        var b = p[i + 1];
+                        var dis = Vector3.Distance(
+                                new Vector3(a.X, a.Y, a.Z),
+                                new Vector3(b.X, b.Y, b.Z));
+                        System.Diagnostics.Debug.WriteLine((l / total_length) + " " + len[i]);
+                        l += dis;
+                    }
+
+                    if (spline.SegPolys != null)
+                    {
+                        ValidateSegPoly(spline);
+                    }
+                }
+            };
+            Items.Add(validate);
+#endif
+        }
+
+        static float[] Solve5x5(float[,] A, float[] B)
+        {
+            const int N = 5;
+            float[,] M = new float[N, N + 1];
+
+            // Build augmented matrix
+            for (int r = 0; r < N; r++)
+            {
+                for (int c = 0; c < N; c++)
+                    M[r, c] = A[r, c];
+
+                M[r, N] = B[r];
+            }
+
+            // Forward elimination
+            for (int i = 0; i < N; i++)
+            {
+                // Pivot
+                int maxRow = i;
+                float maxVal = Math.Abs(M[i, i]);
+
+                for (int r = i + 1; r < N; r++)
+                {
+                    float v = Math.Abs(M[r, i]);
+                    if (v > maxVal)
+                    {
+                        maxVal = v;
+                        maxRow = r;
+                    }
+                }
+
+                if (maxVal < 1e-8f)
+                    return new float[5]; // Degenerate, return zeros
+
+                // Swap
+                if (maxRow != i)
+                {
+                    for (int c = i; c <= N; c++)
+                    {
+                        float tmp = M[i, c];
+                        M[i, c] = M[maxRow, c];
+                        M[maxRow, c] = tmp;
+                    }
+                }
+
+                // Normalize row
+                float invPivot = 1f / M[i, i];
+                for (int c = i; c <= N; c++)
+                    M[i, c] *= invPivot;
+
+                // Eliminate
+                for (int r = 0; r < N; r++)
+                {
+                    if (r == i) continue;
+
+                    float factor = M[r, i];
+                    for (int c = i; c <= N; c++)
+                        M[r, c] -= factor * M[i, c];
+                }
+            }
+
+            // Extract solution
+            float[] x = new float[5];
+            for (int i = 0; i < N; i++)
+                x[i] = M[i, N];
+
+            return x;
+        }
+
+
+        static float[] FitQuartic(float[] s, float[] t)
+        {
+            int n = s.Length;
+            if (t.Length != n)
+                throw new ArgumentException("s and t must have same length");
+
+            // Build normal equation matrices
+            // M = Aᵀ A (5x5)
+            // B = Aᵀ y (5)
+            float[,] M = new float[5, 5];
+            float[] B = new float[5];
+
+            for (int i = 0; i < n; i++)
+            {
+                float s1 = s[i];
+                float s2 = s1 * s1;
+                float s3 = s2 * s1;
+                float s4 = s2 * s2;
+
+                float[] row =
+                {
+                    s4, // s^4
+                    s3, // s^3
+                    s2, // s^2
+                    s1, // s
+                    1f
+                };
+
+                for (int r = 0; r < 5; r++)
+                {
+                    B[r] += row[r] * t[i];
+
+                    for (int c = 0; c < 5; c++)
+                        M[r, c] += row[r] * row[c];
+                }
+            }
+
+            return Solve5x5(M, B);
+        }
+
+
+        static Vector3 EvalSegment(
+            Vector3 P0,
+            Vector3 P1,
+            Vector3 T0,
+            Vector3 T1,
+            float t)
+        {
+            // Hermite basis (unit t)
+            float t2 = t * t;
+            float t3 = t2 * t;
+
+            return
+                (2 * t3 - 3 * t2 + 1) * P0 +
+                (t3 - 2 * t2 + t) * T0 +
+                (-2 * t3 + 3 * t2) * P1 +
+                (t3 - t2) * T1;
+        }
+
+
+        const int SAMPLES = 8;
+
+        static float[] BuildSegPoly(
+            Func<float, Vector3> evalPos,
+            float segLength)
+        {
+            float[] s = new float[SAMPLES];
+            float[] t = new float[SAMPLES];
+
+            Vector3 prev = evalPos(0f);
+            s[0] = 0f;
+            t[0] = 0f;
+
+            for (int i = 1; i < SAMPLES; i++)
+            {
+                t[i] = i / (float)(SAMPLES - 1);
+                Vector3 p = evalPos(t[i]);
+                s[i] = s[i - 1] + Vector3.Distance(prev, p);
+                prev = p;
+            }
+
+            // Normalize s → [0, segLength]
+            float scale = segLength / s[SAMPLES - 1];
+            for (int i = 0; i < SAMPLES; i++)
+                s[i] *= scale;
+
+            // Fit polynomial: t = f(s)
+            return FitQuartic(s, t); // 5 floats
+        }
+
+        static float ComputeSegmentLength(
+            Vector3 P0,
+            Vector3 P1,
+            Vector3 T0,
+            Vector3 T1,
+            int samples = 16)
+        {
+            float length = 0f;
+            Vector3 prev = EvalSegment(P0, P1, T0, T1, 0f);
+
+            for (int i = 1; i <= samples; i++)
+            {
+                float t = i / (float)samples;
+                Vector3 p = EvalSegment(P0, P1, T0, T1, t);
+                length += Vector3.Distance(prev, p);
+                prev = p;
+            }
+
+            return length;
+        }
+
+        static Vector3 ComputeTangent(
+            IReadOnlyList<Vector3> cv,
+            int i,
+            bool closed,
+            float tension)
+        {
+            int count = cv.Count;
+
+            int i0 = i - 1;
+            int i1 = i + 1;
+
+            if (closed)
+            {
+                i0 = (i0 + count) % count;
+                i1 = (i1 + count) % count;
+            }
+            else
+            {
+                i0 = Math.Max(i0, 0);
+                i1 = Math.Min(i1, count - 1);
+            }
+
+            return (1.0f - tension) * 0.5f * (cv[i1] - cv[i0]);
+        }
+
+
+        static void ValidateSegPoly(HSD_Spline spline)
+        {
+            foreach (var v in spline.SegPolys.Array)
+            {
+                System.Diagnostics.Debug.WriteLine(v.Value1 + v.Value2 + v.Value3 + v.Value4 + v.Value5);
+            }
+
+            float t = 0.048788f;
+            float s = 9472.271f * t * t * t * t
+                    - 24099.334f * t * t * t
+                    + 22302.805f * t * t
+                    - 7782.5044f * t
+                    + 6729.586f;
+
+            System.Diagnostics.Debug.WriteLine("huh " + s); // This gives 1606.1036 ≈ segLength
+
+            //var closed = false;
+            //var cv = spline.Points.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray();
+            //var tension = spline.Tension;
+            //int segmentCount = closed ? cv.Length : cv.Length - 1;
+
+            //float[] segLength = new float[segmentCount];
+            //float[][] segPoly = new float[5][];
+
+            //for (int k = 0; k < 5; k++)
+            //    segPoly[k] = new float[segmentCount];
+
+            //for (int i = 0; i < segmentCount; i++)
+            //{
+            //    int i0 = i;
+            //    int i1 = (i + 1) % cv.Length;
+
+            //    Vector3 P0 = cv[i0];
+            //    Vector3 P1 = cv[i1];
+
+            //    Vector3 T0 = ComputeTangent(cv, i0, closed, tension);
+            //    Vector3 T1 = ComputeTangent(cv, i1, closed, tension);
+
+            //    // 1️⃣ compute length
+            //    float L = ComputeSegmentLength(P0, P1, T0, T1);
+            //    segLength[i] = L;
+
+            //    // 2️⃣ build segPoly (THIS is the usage)
+            //    float[] poly = BuildSegPoly(
+            //        t => EvalSegment(P0, P1, T0, T1, t),
+            //        L
+            //    );
+
+            //    // 3️⃣ store into HSD layout
+            //    for (int k = 0; k < 5; k++)
+            //        segPoly[k][i] = poly[k];
+
+            //    System.Diagnostics.Debug.WriteLine(string.Join(", ", poly));
+            //}
         }
 
         private static HSD_AnimJoint GenerateAnimJoint(HSD_Spline spline)

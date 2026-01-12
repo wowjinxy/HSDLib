@@ -140,6 +140,7 @@ namespace HSDRawViewer
         {
             return new Vector4(q.X, q.Y, q.Z, q.W);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -150,6 +151,7 @@ namespace HSDRawViewer
         {
             return Vector4.Dot(q1.ToVector4(), q2.ToVector4());
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -219,6 +221,27 @@ namespace HSDRawViewer
                 v.Y = y;
                 v.Z = z;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="forward"></param>
+        /// <param name="up"></param>
+        public static void ExtractFprwardUp(
+            this Matrix3 m,
+            out Vector3 forward,
+            out Vector3 up)
+        {
+            // Rows are the basis vectors
+            Vector3 right = new Vector3(m.M11, m.M12, m.M13);
+            up = new Vector3(m.M21, m.M22, m.M23);
+            forward = new Vector3(m.M31, m.M32, m.M33);
+
+            // Normalize in case of numerical drift or scale
+            forward.Normalize();
+            up.Normalize();
         }
     }
 }
