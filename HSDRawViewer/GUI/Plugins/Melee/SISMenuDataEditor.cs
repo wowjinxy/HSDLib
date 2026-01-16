@@ -14,7 +14,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// <summary>
     /// big TODO: op codes and editing
     /// </summary>
-    [SupportedTypes(new Type[] { typeof(SBM_SISData) })]
+    [SupportedTypes(new Type[] { typeof(SIS_SdData) })]
     public partial class SISMenuDataEditor : PluginBase
     {
         public MeleeMenuText[] MenuTexts { get; set; }
@@ -29,7 +29,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 _node = value;
 
-                if (value.Accessor is SBM_SISData sisData)
+                if (value.Accessor is SIS_SdData sisData)
                 {
                     MenuTexts = new MeleeMenuText[(sisData._s.Length / 4) - 2];
                     for (int i = 0; i < MenuTexts.Length; i++)
@@ -40,9 +40,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             MenuTexts[i].Data = r._s.GetData();
                     }
 
-                    if (sisData.ImageData != null)
+                    if (sisData.Images != null)
                     {
-                        byte[] image = sisData.ImageData._s.GetData();
+                        byte[] image = sisData.Images._s.GetData();
 
                         HSD_TOBJ tobj = new();
                         tobj.ImageData = new HSD_Image();
@@ -56,7 +56,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                         FileFont = tobj.ToImage().ToBitmap();
                         fontTable.Image = FileFont;
-                        FileSpacing = sisData.CharacterSpacingParams._s.GetData();
+                        FileSpacing = sisData.SpacingParams._s.GetData();
                     }
                     else
                     {
@@ -164,7 +164,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         }
 
                         Rectangle dest = new(xoff, yoff, 32 - after - before, 32);
-                        Rectangle src = new(0, o.Item2[0] * 32 + before, 32, 32 - after - before);
+                        Rectangle src = new(before, o.Item2[0] * 32, 32 - after - before, 32);
 
                         using (Bitmap c = GetColoredCharacter(FileFont, src, colr))
                             if (c != null)
@@ -270,7 +270,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            if (_node.Accessor is SBM_SISData sisData)
+            if (_node.Accessor is SIS_Data sisData)
             {
                 sisData._s.Resize(8 + MenuTexts.Length * 4);
                 for (int i = 0; i < MenuTexts.Length; i++)

@@ -527,12 +527,12 @@ namespace HSDRawViewer.Converters
                 // if this is root bone calculate the clean matrix
                 if (bone.Parent == null)
                 {
-                    CleanRotMatrix = Matrix4.CreateFromQuaternion(new Quaternion(bone.Rotation.X, bone.Rotation.Y, bone.Rotation.Z, bone.Rotation.W));
+                    CleanRotMatrix = bone.WorldTransform.ToTKMatrix();// Matrix4.CreateFromQuaternion(new Quaternion(bone.Rotation.X, bone.Rotation.Y, bone.Rotation.Z, bone.Rotation.W));
                     bone.Rotation = System.Numerics.Quaternion.Identity;
                 }
                 else // otherwise apply the cleaning to current bone
                 {
-                    var pos = Vector3.TransformNormal(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), CleanRotMatrix);
+                    var pos = Vector3.TransformPosition(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), CleanRotMatrix);
                     bone.Translation = new System.Numerics.Vector3(pos.X, pos.Y, pos.Z);
                 }
 
@@ -814,9 +814,16 @@ namespace HSDRawViewer.Converters
                         if (v.Envelope.Weights.Count > 6)
                             throw new Exception($"Too many weights! {v.Envelope.Weights.Count} in {mesh.Name}");
 
+                        float weightSum = v.Envelope.Weights.Sum(e => e.Weight);
+                        if (Math.Abs(weightSum - 1) > 0.05f)
+                            throw new Exception($"Weight don't add to 1.0 {weightSum} in {mesh.Name}");
+
                         // process weights
                         foreach (IOBoneWeight bw in v.Envelope.Weights)
                         {
+                            if (bw.Weight < float.Epsilon)
+                                continue;
+
                             // check if skeleton actually contains bone
                             if (NameToJOBJ.ContainsKey(bw.BoneName))
                             {

@@ -12,7 +12,7 @@ namespace HSDRaw.MEX.Menus
 
         public HSDArrayAccessor<MEX_Menu_Definition> MenuDef { get => _s.GetReference<HSDArrayAccessor<MEX_Menu_Definition>>(0x04); set => _s.SetReference(0x04, value); }
 
-        public SBM_SISData Descriptions { get => _s.GetReference<SBM_SISData>(0x08); set => _s.SetReference(0x08, value); }
+        public SIS_Data Descriptions { get => _s.GetReference<SIS_Data>(0x08); set => _s.SetReference(0x08, value); }
 
         public HSD_MatAnimJoint OptionTextures { get => _s.GetReference<HSD_MatAnimJoint>(0x0C); set => _s.SetReference(0x0C, value); }
 

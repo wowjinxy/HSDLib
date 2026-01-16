@@ -1,15 +1,82 @@
-﻿using HSDRaw.Tools.Melee;
+﻿using HSDRaw.Common;
+using HSDRaw.Tools.Melee;
+using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HSDRaw.Melee
 {
     /// <summary>
+    /// 32x32 i4 image
+    /// </summary>
+    public class SIS_Character : HSDAccessor
+    {
+        public override int TrimmedSize => 512;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public HSD_TOBJ ToTObj()
+        {
+            return new HSD_TOBJ()
+            {
+                ImageData = new HSD_Image()
+                {
+                    Width = 32,
+                    Height = 32,
+                    ImageData = _s.GetData(),
+                    Format = HSDRaw.GX.GXTexFmt.I4,
+                }
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        /// <returns></returns>
+        public bool FromTObj(HSD_TOBJ tobj)
+        {
+            if (tobj.ImageData == null)
+                return false;
+
+            var i = tobj.ImageData;
+
+            if (i.Width != 32 || 
+                i.Height != 32 || 
+                i.Format != GX.GXTexFmt.I4)
+                return false;
+
+            var data = i.ImageData;
+
+            if (data.Length != 512)
+                Array.Resize(ref data, 512);
+
+            _s.SetData(data);
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Character spacing param for sis node
+    /// </summary>
+    public class SIS_Spacing : HSDAccessor
+    {
+        public override int TrimmedSize => 2;
+
+        public byte Before { get => _s.GetByte(0); set => _s.SetByte(0, value); }
+
+        public byte After { get => _s.GetByte(1); set => _s.SetByte(1, value); }
+    }
+
+    /// <summary>
     /// 
     /// </summary>
-    public class SBM_SISData : HSDAccessor
+    public class SIS_SdData : HSDAccessor
     {
-        public HSDAccessor ImageData { get => _s.GetReference<HSDAccessor>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDArrayAccessor<SIS_Character> Images { get => _s.GetReference<HSDArrayAccessor<SIS_Character>>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDAccessor CharacterSpacingParams { get => _s.GetReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDArrayAccessor<SIS_Spacing> SpacingParams { get => _s.GetReference<HSDArrayAccessor<SIS_Spacing>>(0x04); set => _s.SetReference(0x04, value); }
 
         // everything else is op codes for drawing
 

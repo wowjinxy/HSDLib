@@ -21,7 +21,12 @@ namespace HSDRaw.Tools
 
             foreach (var track in tracks)
             {
+                // track has no animation
                 if (track.JointTrackType == JointTrackType.HSD_A_J_NONE)
+                    continue;
+
+                // track already exists
+                if (optimizedTracks.Exists(e => e.TrackType == track.TrackType))
                     continue;
 
                 if (IsConstant(track, 0.01f))

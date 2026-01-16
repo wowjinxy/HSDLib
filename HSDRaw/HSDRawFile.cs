@@ -838,7 +838,7 @@ namespace HSDRaw
                 x => x.StartsWith("mexMapData") ?  new MEX_mexMapData() : null,
                 x => x.StartsWith("mexSelectChr") ?  new MEX_mexSelectChr() : null,
                 x => x.StartsWith("mobj") ?  new HSD_MOBJ() : null,
-                x => x.StartsWith("SIS_") ?  new SBM_SISData() : null,
+                x => x.StartsWith("SIS_") ?  new SIS_SdData() : null,
                 x => x.Equals("evMenu") ?  new SBM_EventMenu() : null,
                 x => x.EndsWith("ColAnimData") ||
                     x.Equals("lbBgFlashColAnimData") ?  new HSDArrayAccessor<ftCommonColorEffect>() : null,

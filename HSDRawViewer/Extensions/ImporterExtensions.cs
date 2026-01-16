@@ -119,9 +119,15 @@ namespace HSDRawViewer.Extensions
                     Vector3 r = specialBoneRotations[boneIndex];
                     bone.RotationEuler = new System.Numerics.Vector3((float)(r.X * Math.PI / 180), (float)(r.Y * Math.PI / 180), (float)(r.Z * Math.PI / 180));
                 }
-                else if (bone.Name.EndsWith("mantNa"))
+                else if (bone.Name.EndsWith("mantNa") || 
+                    bone.Name.EndsWith("FeelerA") || 
+                    bone.Name.EndsWith("FeelerB") || 
+                    bone.Name.EndsWith("FeelerC"))
                 {
-                    bone.RotateX = (float)(Math.PI / 2);
+                    //bone.RotateX = (float)(Math.PI / 2);
+                    var eye = worldTransform[bone].Translation;
+                    var target = worldTransform[bone.Child].Translation;
+                    bone.Rotation = NumericsExtensions.LookAtZ(eye, target);
                 }
                 else
                 {

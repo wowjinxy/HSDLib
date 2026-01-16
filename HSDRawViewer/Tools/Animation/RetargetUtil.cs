@@ -1,8 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using HSDRaw.Tools.Melee;
-using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using System.Collections.Generic;
