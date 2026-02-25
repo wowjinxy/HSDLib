@@ -1,8 +1,10 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Converters.Brawl;
+using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Animation;
@@ -18,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using static HSDRawViewer.Rendering.JointAnimManager;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
@@ -316,12 +319,13 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             // set animation
             int ji = 0;
+            var meshListDobjs = _meshList.EnumerateDObjs.ToList();
             foreach (MatAnimJoint j in matanim.Nodes)
             {
                 int mi = 0;
                 foreach (MatAnim mat in j.Nodes)
                 {
-                    DObjProxy d = _meshList.EnumerateDObjs.FirstOrDefault(e => e.DOBJIndex == mi && e.JOBJIndex == ji);
+                    DObjProxy d = meshListDobjs.FirstOrDefault(e => e.DOBJIndex == mi && e.JOBJIndex == ji);
 
                     if (d != null)
                     {
@@ -795,6 +799,54 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        private HSD_MatAnimJoint ToHsdMatAnim(HSD_JOBJ root)
+        {
+            var matanim = root.GenerateMatAnimJoint();
+            var tree = matanim.TreeList;
+            foreach (var m in tree)
+                m.MaterialAnimation = null;
+
+            var meshListDobjs = _meshList.EnumerateDObjs.ToList();
+            int ji = 0;
+            foreach (JObjProxy n in _jointTree.EnumerateJoints())
+            {
+                var dobjs = meshListDobjs.Where(e => e.JOBJIndex == ji).ToList();
+                if (dobjs.Count == 0)
+                {
+                    ji++;
+                    continue;
+                }    
+
+
+                foreach (var dobj in dobjs)
+                {
+                    HSD_MatAnim a = new();
+
+                    if (dobj.Tracks != null && dobj.Tracks.Count > 0)
+                    {
+                        a.AnimationObject = dobj.Tracks.ToAObj(0);
+                    }
+
+                    if (dobj.TextureStates != null &&
+                        dobj.TextureStates.Length > 0)
+                    {
+                        for (int t = 0; t < dobj.TextureStates.Length; t++)
+                            if (dobj.TextureStates[t].Tracks.Count > 0)
+                                a.AddTexAnim(dobj.TextureStates[t].ToHSDTexAnim(t));
+                    }
+
+                    tree[ji].AddMatAnim(a);
+                }
+                ji++;
+            }
+
+            return matanim;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
@@ -1088,9 +1140,25 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void asMatAnimJointToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
 
+            if (f != null)
+            {
+                HSDRawFile animFile = new();
+                animFile.Roots.Add(new HSDRootNode()
+                {
+                    Data = ToHsdMatAnim(_root),
+                    Name = "_matanim_joint"
+                });
+                animFile.Save(f);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importAndRemapRelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using PropertyDialog p = new("Import and Retarget", _importRemapSettings);

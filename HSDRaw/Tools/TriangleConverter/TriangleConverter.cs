@@ -25,7 +25,7 @@ namespace HSDRaw.Tools.TriangleConverter
             _pushCacheHits = pushCacheHits;
         }
 
-        public List<PrimitiveGroup> GroupPrimitives(GX_Vertex[] points, out int pointCount, out int faceCount)
+        public List<PrimitiveGroup> GroupPrimitives(GX_Vertex[] points, PrimitiveOrderSortBy sort, out int pointCount, out int faceCount)
         {
             pointCount = 0;
             faceCount = 0;
@@ -100,6 +100,9 @@ namespace HSDRaw.Tools.TriangleConverter
                     groups.Add(g);
                 }
             }
+
+            foreach (var g in groups)
+                g.SortBy(sort);
 
             return groups;
         }

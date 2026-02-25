@@ -35,7 +35,9 @@ namespace HSDRaw.Common
         LOBJ_HIDDEN = (1 << 5),
         LOBJ_RAW_PARAM = (1 << 6),
         LOBJ_DIFF_DIRTY = (1 << 7),
-        LOBJ_SPEC_DIRTY = (1 << 8)
+        LOBJ_SPEC_DIRTY = (1 << 8),
+
+        LOBJ_SHADOW = 0x400,
     }
 
     public class HSD_Light : HSDAccessor

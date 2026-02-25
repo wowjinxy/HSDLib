@@ -1,12 +1,20 @@
 ﻿using HSDRaw.GX;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRaw.Tools.TriangleConverter
 {
+    public enum PrimitiveOrderSortBy
+    {
+        NONE,
+        X,
+        Y,
+        Z,
+        NegX,
+        NegY,
+        NegZ,
+    }
+
     public class PrimitiveGroup
     {
         public HashSet<ushort> _nodes = new HashSet<ushort>();
@@ -75,6 +83,86 @@ namespace HSDRaw.Tools.TriangleConverter
                 return true;
             }
             return false;
+        }
+        static float GetPrimitiveX(PrimitiveClass p)
+        {
+            float min = float.MaxValue;
+
+            foreach (var v in p.Points)
+                min = Math.Min(min, v.POS.X);
+
+            return min;
+        }
+        static float GetPrimitiveY(PrimitiveClass p)
+        {
+            float min = float.MaxValue;
+
+            foreach (var v in p.Points)
+                min = Math.Min(min, v.POS.Y);
+
+            return min;
+        }
+        static float GetPrimitiveZ(PrimitiveClass p)
+        {
+            float min = float.MaxValue;
+
+            foreach (var v in p.Points)
+                min = Math.Min(min, v.POS.Z);
+
+            return min;
+        }
+        public void SortBy(PrimitiveOrderSortBy sort)
+        {
+            if (sort == PrimitiveOrderSortBy.NONE)
+                return;
+
+            var all = new List<PrimitiveClass>();
+
+            all.AddRange(_triangles);
+            all.AddRange(_tristrips);
+
+            all.Sort((a, b) =>
+            {
+                int v = 0;
+                switch (sort)
+                {
+                    case PrimitiveOrderSortBy.X:
+                        v = GetPrimitiveX(a).CompareTo(GetPrimitiveX(b));
+                        break;
+                    case PrimitiveOrderSortBy.Y:
+                        v = GetPrimitiveY(a).CompareTo(GetPrimitiveY(b));
+                        break;
+                    case PrimitiveOrderSortBy.Z:
+                        v = GetPrimitiveZ(a).CompareTo(GetPrimitiveZ(b));
+                        break;
+                    case PrimitiveOrderSortBy.NegX:
+                        v = GetPrimitiveX(a).CompareTo(GetPrimitiveX(b)) * -1;
+                        break;
+                    case PrimitiveOrderSortBy.NegY:
+                        v = GetPrimitiveY(a).CompareTo(GetPrimitiveY(b)) * -1;
+                        break;
+                    case PrimitiveOrderSortBy.NegZ:
+                        v = GetPrimitiveZ(a).CompareTo(GetPrimitiveZ(b)) * -1;
+                        break;
+                }
+
+                if (v != 0) return v;
+
+                // tie-breaker: strips first
+                return PrimitiveClass.Compare(a, b);
+            }
+            );
+
+            _triangles.Clear();
+            _tristrips.Clear();
+
+            foreach (var p in all)
+            {
+                if (p is PointTriangle t)
+                    _triangles.Add(t);
+                else if (p is PointTriangleStrip s)
+                    _tristrips.Add(s);
+            }
         }
     }
 

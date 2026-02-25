@@ -9,5 +9,18 @@
         public override HSD_MatAnimJoint Next { get => _s.GetReference<HSD_MatAnimJoint>(0x04); set => _s.SetReference(0x04, value); }
 
         public HSD_MatAnim MaterialAnimation { get => _s.GetReference<HSD_MatAnim>(0x08); set => _s.SetReference(0x08, value); }
+
+        public void AddMatAnim(HSD_MatAnim anim)
+        {
+            anim.Next = null;
+            if (MaterialAnimation == null)
+            {
+                MaterialAnimation = anim;
+            }
+            else
+            {
+                MaterialAnimation.Add(anim);
+            }
+        }
     }
 }

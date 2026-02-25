@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Melee.Gr;
+using HSDRawViewer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace HSDRawViewer.ContextMenus.Melee
                     gobj.RootNode != null)
                 {
                     gobj.MaterialAnimations = new HSDNullPointerArrayAccessor<HSDRaw.Common.Animation.HSD_MatAnimJoint>();
-                    gobj.MaterialAnimations.Array = new HSDRaw.Common.Animation.HSD_MatAnimJoint[] { JOBJContextMenu.GenerateMatAnimJointFromJOBJ(gobj.RootNode) };
+                    gobj.MaterialAnimations.Array = new HSDRaw.Common.Animation.HSD_MatAnimJoint[] { gobj.RootNode.GenerateMatAnimJoint() };
 
                     MainForm.SelectedDataNode.Refresh();
                 }

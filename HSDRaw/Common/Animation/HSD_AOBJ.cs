@@ -42,6 +42,15 @@ namespace HSDRaw.Common.Animation
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="player"></param>
+        public void AddTrack(FOBJ_Player player)
+        {
+            AddTrack(player.TrackType, player.Keys);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="trackType"></param>
         /// <param name="keys"></param>
         public void AddTrack(byte trackType, List<FOBJKey> keys)

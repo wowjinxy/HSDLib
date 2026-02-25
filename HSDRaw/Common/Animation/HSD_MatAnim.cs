@@ -15,5 +15,18 @@
                 if (value) _s.SetInt32(0x0C, 1); else _s.SetInt32(0x0C, 0);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="anim"></param>
+        public void AddTexAnim(HSD_TexAnim anim)
+        {
+            anim.Next = null;
+            if (TextureAnimation == null)
+                TextureAnimation = anim;
+            else
+                TextureAnimation.Add(anim);
+        }
     }
 }

@@ -11,6 +11,10 @@ namespace HSDRawViewer.Rendering
     public class MatAnimJoint
     {
         public List<MatAnim> Nodes = new();
+
+        public int Index { get; set; }
+
+        public int Parent { get; set; }
     }
 
     public class MatAnim
@@ -136,6 +140,66 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        private void ParseAnimJoint(HSD_MatAnimJoint joint, int parent)
+        {
+            MatAnimJoint matjoint = new()
+            {
+                Parent = parent,
+                Index = Nodes.Count,
+            };
+            Nodes.Add(matjoint);
+
+            if (joint.Child != null)
+                ParseAnimJoint(joint.Child, Nodes.Count);
+
+            if (joint.Next != null)
+                ParseAnimJoint(joint.Next, Nodes.Count);
+
+            if (joint.MaterialAnimation == null)
+                return;
+
+            foreach (HSD_MatAnim a in joint.MaterialAnimation.List)
+            {
+                MatAnim anm = new();
+
+                if (a.AnimationObject != null)
+                {
+                    FrameCount = (int)Math.Max(FrameCount, a.AnimationObject.EndFrame);
+
+                    foreach (HSD_FOBJDesc fdesc in a.AnimationObject.FObjDesc.List)
+                        anm.Tracks.Add(new FOBJ_Player(fdesc));
+                }
+
+                if (a.TextureAnimation != null)
+                    foreach (HSD_TexAnim t in a.TextureAnimation.List)
+                    {
+                        MatAnimTexture tex = new();
+
+                        tex.Textures.AddRange(t.ToTOBJs());
+
+                        tex.TextureID = t.GXTexMapID;
+
+                        if (t.AnimationObject != null)
+                        {
+                            if (t.AnimationObject != null)
+                            {
+                                FrameCount = (int)Math.Max(FrameCount, t.AnimationObject.EndFrame);
+
+                                foreach (HSD_FOBJDesc fdesc in t.AnimationObject.FObjDesc.List)
+                                    tex.Tracks.Add(new FOBJ_Player(fdesc));
+                            }
+                        }
+
+                        anm.TextureAnims.Add(tex);
+                    }
+
+                matjoint.Nodes.Add(anm);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public MatAnimManager FromMatAnim(HSD_MatAnimJoint joint)
         {
             Nodes.Clear();
@@ -144,49 +208,7 @@ namespace HSDRawViewer.Rendering
             if (joint == null)
                 return this;
 
-            foreach (HSD_MatAnimJoint j in joint.TreeList)
-            {
-                MatAnimJoint matjoint = new();
-                if (j.MaterialAnimation != null)
-                    foreach (HSD_MatAnim a in j.MaterialAnimation.List)
-                    {
-                        MatAnim anm = new();
-
-                        if (a.AnimationObject != null)
-                        {
-                            FrameCount = (int)Math.Max(FrameCount, a.AnimationObject.EndFrame);
-
-                            foreach (HSD_FOBJDesc fdesc in a.AnimationObject.FObjDesc.List)
-                                anm.Tracks.Add(new FOBJ_Player(fdesc));
-                        }
-
-                        if (a.TextureAnimation != null)
-                            foreach (HSD_TexAnim t in a.TextureAnimation.List)
-                            {
-                                MatAnimTexture tex = new();
-
-                                tex.Textures.AddRange(t.ToTOBJs());
-
-                                tex.TextureID = t.GXTexMapID;
-
-                                if (t.AnimationObject != null)
-                                {
-                                    if (t.AnimationObject != null)
-                                    {
-                                        FrameCount = (int)Math.Max(FrameCount, t.AnimationObject.EndFrame);
-
-                                        foreach (HSD_FOBJDesc fdesc in t.AnimationObject.FObjDesc.List)
-                                            tex.Tracks.Add(new FOBJ_Player(fdesc));
-                                    }
-                                }
-
-                                anm.TextureAnims.Add(tex);
-                            }
-
-                        matjoint.Nodes.Add(anm);
-                    }
-                Nodes.Add(matjoint);
-            }
+            ParseAnimJoint(joint, -1);
 
             return this;
         }
@@ -195,10 +217,24 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <returns></returns>
+        private HSD_MatAnimJoint ToMatAnim(MatAnimJoint m)
+        {
+            HSD_MatAnimJoint j = new();
+
+            // get all children
+
+            // get all siblings if root?
+
+            return j;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public HSD_MatAnimJoint ToMatAnim()
         {
-            // TODO:
-            throw new NotImplementedException();
+            return ToMatAnim(Nodes[0]);
         }
 
         /// <summary>

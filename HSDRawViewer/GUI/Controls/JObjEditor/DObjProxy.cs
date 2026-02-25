@@ -1,5 +1,8 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +16,37 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public List<HSD_TOBJ> Textures { get; internal set; } = new List<HSD_TOBJ>();
 
         public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
+
+        public HSD_TexAnim ToHSDTexAnim(int map_id)
+        {
+            var a = new HSD_TexAnim()
+            {
+                GXTexMapID = HSDRaw.GX.GXTexMapID.GX_TEXMAP0 + map_id,
+                AnimationObject = Tracks.ToAObj(0),
+            };
+
+            if (Textures.Count > 0)
+            {
+                HSDArrayAccessor<HSD_TexBuffer> tex = new();
+                tex.Array = Textures.Select(t => new HSD_TexBuffer()
+                {
+                    Data = t.ImageData,
+                }).ToArray();
+                a.ImageBuffers = tex;
+
+                if (Textures.Any(e => e.TlutData != null))
+                {
+                    HSDArrayAccessor<HSD_TlutBuffer> tlut = new();
+                    tlut.Array = Textures.Select(t => new HSD_TlutBuffer()
+                    {
+                        Data = t.TlutData,
+                    }).ToArray();
+                    a.TlutBuffers = tlut;
+                }
+            }
+
+            return a;
+        }
     }
     public enum CullMode
     {

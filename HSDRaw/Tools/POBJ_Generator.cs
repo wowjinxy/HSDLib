@@ -29,6 +29,8 @@ namespace HSDRaw.Tools
 
         public float Tolerance { get; set; } = 0.0f;
 
+        public TriangleConverter.PrimitiveOrderSortBy TriangleSort { get; set; } = TriangleConverter.PrimitiveOrderSortBy.Z;
+
         public GenCullMode CullMode { get; set; } = GenCullMode.Front;
 
         private Dictionary<GXAttribName, Dictionary<int, int>> nameToIndexHash = new Dictionary<GXAttribName, Dictionary<int, int>>();
@@ -400,7 +402,7 @@ namespace HSDRaw.Tools
                 attributes = al.ToArray();
             }*/
 
-            var groups = converter.GroupPrimitives(triList.ToArray(), out int pointCount, out int faceCount);
+            var groups = converter.GroupPrimitives(triList.ToArray(), TriangleSort, out int pointCount, out int faceCount);
 
             HSD_POBJ rootPOBJ = null;
             HSD_POBJ prevPOBJ = null;

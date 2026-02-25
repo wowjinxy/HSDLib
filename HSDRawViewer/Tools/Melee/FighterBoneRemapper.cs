@@ -336,21 +336,26 @@ namespace HSDRawViewer.Tools.Melee
             // TODO: Shield Pose
 
             // Physics
+            if (fd.Physics != null)
             {
-                var ar = fd.Physics.DynamicDesc.Array;
-                foreach (var a in ar)
+                if (fd.Physics.DynamicDesc != null)
                 {
-                    a.BoneIndex = RemapBone(a.BoneIndex);
+                    var ar = fd.Physics.DynamicDesc.Array;
+                    foreach (var a in ar)
+                    {
+                        a.BoneIndex = RemapBone(a.BoneIndex);
+                    }
+                    fd.Physics.DynamicDesc.Array = ar;
                 }
-                fd.Physics.DynamicDesc.Array = ar;
-            }
-            {
-                var ar = fd.Physics.Hitbubbles.Array;
-                foreach (var a in ar)
+                if (fd.Physics.Hitbubbles != null)
                 {
-                    a.BoneIndex = RemapBone(a.BoneIndex);
+                    var ar = fd.Physics.Hitbubbles.Array;
+                    foreach (var a in ar)
+                    {
+                        a.BoneIndex = RemapBone(a.BoneIndex);
+                    }
+                    fd.Physics.Hitbubbles.Array = ar;
                 }
-                fd.Physics.Hitbubbles.Array = ar;
             }
 
             // Hurtboxes

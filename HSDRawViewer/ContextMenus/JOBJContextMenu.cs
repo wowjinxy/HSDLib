@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
+using HSDRawViewer.Extensions;
 using System;
 using System.Windows.Forms;
 
@@ -36,7 +37,7 @@ namespace HSDRawViewer.ContextMenus
                         HSDRawFile f = new();
                         HSDRootNode r = new();
                         r.Name = "matanim_joint";
-                        r.Data = GenerateMatAnimJointFromJOBJ(root);
+                        r.Data = root.GenerateMatAnimJoint();
                         f.Roots.Add(r);
                         f.Save(file);
                     }
@@ -85,33 +86,6 @@ namespace HSDRawViewer.ContextMenus
             addChild.DropDownItems.Add(createJOBJFromFile);
 
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        public static HSD_MatAnimJoint GenerateMatAnimJointFromJOBJ(HSD_JOBJ node)
-        {
-            HSD_MatAnimJoint joint = new();
-
-            if (node.Dobj != null)
-                foreach (HSD_DOBJ v in node.Dobj.List)
-                {
-                    if (joint.MaterialAnimation == null)
-                        joint.MaterialAnimation = new HSD_MatAnim();
-                    else
-                        joint.MaterialAnimation.Add(new HSD_MatAnim() { });
-                }
-
-            foreach (HSD_JOBJ v in node.Children)
-            {
-                joint.AddChild(GenerateMatAnimJointFromJOBJ(v));
-            }
-
-            return joint;
-        }
-
 
         /// <summary>
         /// 

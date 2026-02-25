@@ -231,6 +231,11 @@ namespace HSDRawViewer.IO.Model
                         //v.POS = v.POS.TransformPosition(root.GetJObjFromDesc(parent).WorldTransform.Inverted());
                         //v.NRM = v.NRM.TransformNormal(root.GetJObjFromDesc(parent).WorldTransform.Inverted());
 
+                        if (float.IsNaN(v.NRM.X) ||
+                            float.IsNaN(v.NRM.Y) ||
+                            float.IsNaN(v.NRM.Z))
+                            v.NRM = new GXVector3(0, 0, 0);
+
                         verts[i] = v;
                     }
 
@@ -242,7 +247,6 @@ namespace HSDRawViewer.IO.Model
                             attrs.Add(a.AttributeName);
                 }
             }
-
             Optimize(vertices, Triangles);
 
             foreach (var attr in attrs)
@@ -421,6 +425,11 @@ namespace HSDRawViewer.IO.Model
             {
                 bones = Triangles.Select(e => Skin.Bones[vertices[e].PNMTXIDX].Select(i => imp.Root.TreeList[i]).ToArray()).ToList();
                 weights = Triangles.Select(e => Skin.Weights[vertices[e].PNMTXIDX].ToArray()).ToList();
+            }
+
+            if (tri.Any(t=>t.CLR0.A != 1.0))
+            {
+                imp.PObjGenerator.VertexColorFormat = (GXCompType)GXCompTypeClr.RGBA8;
             }
 
             dobj.Pobj = imp.PObjGenerator.CreatePOBJsFromTriangleList(tri, 

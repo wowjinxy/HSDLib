@@ -20,7 +20,7 @@ namespace HSDRaw.MEX.Akaneia
 
         public int Non0Count { get => _s.GetInt32(0x14); internal set => _s.SetInt32(0x14, value); }
 
-        public float Size { get => _s.GetFloat(0x18); internal set => _s.SetFloat(0x18, value); }
+        public float Size { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
 
         /// <summary>
         /// 

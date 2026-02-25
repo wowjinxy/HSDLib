@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -212,6 +213,11 @@ namespace HSDRawViewer.Tools.Animation
             return new_anim;
         }
 
+        private static Quaternion GetBindRotation(LiveJObj jobj)
+        {
+            return Math3D.EulerToQuat(new Vector3(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ));
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -224,15 +230,36 @@ namespace HSDRawViewer.Tools.Animation
             OpenTK.Mathematics.Matrix4 rel = bind * source.WorldTransform;
 
             if (target.Parent != null)
-                rel *= target.Parent.WorldTransform.Inverted();
+                rel = rel * target.Parent.WorldTransform.Inverted();
 
-            OpenTK.Mathematics.Vector3 relTranslate = rel.ExtractTranslation();
-            OpenTK.Mathematics.Vector3 rot = rel.ExtractRotationEuler();
-            OpenTK.Mathematics.Vector3 relScale = rel.ExtractScale();
+            rel.Decompose(out Vector3 scale, out Quaternion rot, out Vector3 trans);
 
-            target.Translation = relTranslate;
-            target.Rotation = new OpenTK.Mathematics.Vector4(rot);
-            target.Scale = relScale;
+            //target.Translation = trans;
+            target.Rotation = new Vector4(rot.ToEulerAngles());
+            //target.Scale = scale;
+
+            // translation...
+            if (source.Parent != null && target.Parent != null)
+            {
+                Vector3 srcBind = new(source.Desc.TX, source.Desc.TY, source.Desc.TZ);
+                Vector3 srcAnim = source.Translation;
+
+                Vector3 deltaSrcLocal = srcAnim - srcBind;
+
+                if (deltaSrcLocal.LengthFast > 0.01)
+                {
+                    Quaternion srcBindRot = GetBindRotation(source.Parent);
+                    Quaternion tgtBindRot = GetBindRotation(target.Parent);
+
+                    Quaternion rotDiff = tgtBindRot.Inverted() * srcBindRot;
+
+                    Vector3 deltaTgtLocal = Vector3.Transform(deltaSrcLocal, rotDiff);
+
+                    Vector3 tgtBind = new(target.Desc.TX, target.Desc.TY, target.Desc.TZ);
+                    target.Translation = tgtBind + deltaTgtLocal;
+                }
+            }
+
 
             target.RecalculateTransforms(null, true);
         }

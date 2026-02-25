@@ -774,6 +774,31 @@ namespace HSDRawViewer.Converters
                 List<HSD_JOBJ[]> jobjList = new();
                 List<float[]> weightList = new();
 
+                //
+                //List<int> faces = poly.Indicies;
+                //List<IOVertex> verts = mesh.Vertices; 
+                
+                //var tris = new List<int[]>(faces.Count / 3);
+                //for (int i = 0; i < faces.Count; i += 3)
+                //{
+                //    tris.Add(new[]
+                //    {
+                //        faces[i],
+                //        faces[i + 1],
+                //        faces[i + 2]
+                //    });
+                //}
+                //float TriZ(int[] t) =>
+                //    Math.Min(
+                //        verts[t[0]].Position.Z,
+                //        Math.Min(
+                //            verts[t[1]].Position.Z,
+                //            verts[t[2]].Position.Z
+                //        )
+                //    );
+                //tris.Sort((a, b) => TriZ(a).CompareTo(TriZ(b)));
+                //
+
                 // generarte vertex list
                 foreach (int face in poly.Indicies)
                 {
@@ -938,6 +963,14 @@ namespace HSDRawViewer.Converters
 
                 if (pobj != null)
                 {
+                    // check if material has cull info
+                    if (material != null &&
+                        material.Name.ToLowerInvariant().Contains("cullboth"))
+                            foreach (var p in pobj.List)
+                            {
+                                p.Flags &= ~(POBJ_FLAG.CULLFRONT | POBJ_FLAG.CULLBACK);
+                            }
+
                     if (dobj.Pobj == null)
                         dobj.Pobj = pobj;
                     else
@@ -1206,6 +1239,27 @@ namespace HSDRawViewer.Converters
                             pathToTObj.Add(texturePath, tobj);
                         }
                     }
+                }
+            }
+
+            // additional name information from materila name
+            var matname = material.Name.ToLowerInvariant();
+
+            if (matname.Contains("transparent"))
+                Mobj.RenderFlags |= RENDER_MODE.XLU;
+
+            if (matname.Contains("shadow"))
+                Mobj.RenderFlags |= RENDER_MODE.SHADOW;
+
+            if (Mobj.Textures != null)
+            {
+                foreach (var t in Mobj.Textures.List)
+                {
+                    if (matname.Contains("clamps"))
+                        t.WrapS = GXWrapMode.CLAMP;
+
+                    if (matname.Contains("clampt"))
+                        t.WrapT = GXWrapMode.CLAMP;
                 }
             }
 

@@ -40,7 +40,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             MenuTexts[i].Data = r._s.GetData();
                     }
 
-                    if (sisData.Images != null)
+                    if (sisData.Images != null && 
+                        sisData.Images.Length > 0)
                     {
                         byte[] image = sisData.Images._s.GetData();
 

@@ -44,10 +44,12 @@ namespace HSDRawViewer.ContextMenus
 
                         // connect the lines to form one line
                         List<HSD_Vector3> lpoints = new();
-                        foreach (int i in poly.GetConnectedLine())
+                        //var con = poly.GetConnectedLine().ToList();
+                        foreach (int i in poly.Lines.Select(p => p.Indices[0]))
                         {
                             lpoints.Add(obj.Vertices[i]);
                         }
+                        lpoints.Add(obj.Vertices[poly.Lines[poly.Lines.Count - 1].Indices[1]]);
 
                         // calculate total length
                         float total_length = 0;
