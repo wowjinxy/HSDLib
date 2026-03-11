@@ -183,7 +183,19 @@ namespace HSDRawViewer.Rendering.Renderers
 
             // render particles
             OpenTK.Mathematics.Vector3 pos = c.TransformedPosition;
-            foreach (Particle p in Particles.OrderBy(e => -(e.Pos - pos).LengthSquared))
+
+            // draw sorted
+            var sorted = Particles.Where(e => !e.Kind.HasFlag(ParticleKind.NoSort)).OrderBy(e => -(e.Pos - pos).LengthSquared);
+            foreach (Particle p in sorted)
+            {
+                if (p.TexG >= 0)
+                    p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));
+                else
+                    p.Render(c, _shader, null);
+            }
+
+            // draw not sorted
+            foreach (Particle p in Particles.Where(e => e.Kind.HasFlag(ParticleKind.NoSort)))
             {
                 if (p.TexG >= 0)
                     p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));

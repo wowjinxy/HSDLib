@@ -896,7 +896,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             }
                             break;
                         case 0xE2: // set bit4
-                            Kind |= ParticleKind.Bit4;
+                            Kind |= ParticleKind.NoSort;
                             break;
                         case 0xE3: // set palNum
                             palNum = (sbyte)cmdList[cmdPtr++];
@@ -1430,9 +1430,16 @@ namespace HSDRawViewer.Rendering.Renderers
 
             // 803a0dd0 - 803a0e00
             // z mode setup
-            GL.Disable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Lequal);
             // GL.DepthMask(true);// Kind.HasFlag(ParticleKind.Bit4));
+            if (Kind.HasFlag(ParticleKind.NoSort))
+            {
+                GL.Enable(EnableCap.DepthTest);
+                GL.DepthFunc(DepthFunction.Lequal);
+            }
+            else
+            {
+                GL.Disable(EnableCap.DepthTest);
+            }
 
             // 803a0e14 - 803a0e34
             // TODO: fog for particles

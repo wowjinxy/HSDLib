@@ -45,7 +45,7 @@ bool alpha_test(float alpha)
 	if(alphaOp == -1)
 		return false;
 
-	if(alpha < 0)
+	if(alpha <= 0)
 		return true;
 	
 	bool ref0 = discard_alpha_test(alphaComp0, alphaRef0, alpha);

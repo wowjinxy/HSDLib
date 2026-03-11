@@ -147,7 +147,7 @@ namespace HSDRaw.Common
         Gravity     = 0x00000001,
         Friction    = 0x00000002,
         Tornado     = 0x00000004,
-        Bit4        = 0x00000008,
+        NoSort      = 0x00000008,
 
         ComTLUT     = 0x00000010,
         MirrorS     = 0x00000020,
