@@ -25,6 +25,9 @@ using HSDRaw.Melee.Ty;
 using HSDRaw.MEX.Akaneia;
 using HSDRaw.MEX.Characters;
 using HSDRaw.Melee.Cmd;
+using HSDRaw.MEX.Cpu;
+using HSDRaw.MEX.Param;
+using HSDRaw.AirRide.Ext;
 
 namespace HSDRaw
 {
@@ -877,6 +880,10 @@ namespace HSDRaw
                 x => x.EndsWith("ALDYakuAll") ?  new HSDNullPointerArrayAccessor<SBM_ItemSubactionData>() : null,
                 x => x.EndsWith("hazard_list") ?  new HSDNullPointerArrayAccessor<HSD_String>() : null,
                 x => x.EndsWith("fog_list") ?  new HSDNullPointerArrayAccessor<HSD_FogAnim>() : null,
+                x => x.EndsWith("cpu_data") ?  new MEX_CpuData() : null,
+                x => x.EndsWith("_tobj") ?  new HSD_TOBJ() : null,
+                x => x.EndsWith("allstar_fighters") ?  new HSDArrayAccessor<MEX_AllStarFigther>() : null,
+                x => x.EndsWith("hud_colors") ?  new HSDNullPointerArrayAccessor<KAR_HudColor>() : null,
                 x => new HSDAccessor(),
         };
 

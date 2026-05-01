@@ -214,8 +214,20 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRaw.GX.GXTexFmt texFmt = _texGraphic.ImageFormat;
                     HSDRaw.GX.GXTlutFmt palFmt = _texGraphic.PaletteFormat;
 
+                    using TextureImportDialog d = new();
+                    if (d.ShowDialog() == DialogResult.OK)
+                    {
+                        texFmt = d.TextureFormat;
+                        palFmt = d.PaletteFormat;
+                    }
+                    else
+                        return;
+
                     using (SixLabors.ImageSharp.Image<Bgra32> bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
+                    {
+                        d.ApplySettings(bmp);
                         proxy.TOBJ.EncodeImageData(bmp.ToTObj(texFmt, palFmt).GetDecodedImageData(), _texGraphic.Width, _texGraphic.Height, texFmt, palFmt);
+                    }
 
                     SaveTextures();
                 }

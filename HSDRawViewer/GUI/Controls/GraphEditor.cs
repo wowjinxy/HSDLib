@@ -1206,6 +1206,7 @@ NONE - None (do not use)";
         {
             WriteIndented = true,
         };
+
         /// <summary>
         /// 
         /// </summary>
