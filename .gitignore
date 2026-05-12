@@ -264,3 +264,6 @@ __pycache__/
 /HSDRawViewer/Tools/EulerFilter.cs
 /HSDRawViewer/Tools/Optimizers
 /HSDRawViewer/Tools/TestRendering.cs
+/HSDRawViewer/Tools/TestPhysicsRendering.cs
+/HSDRawViewer/Tools/Physics/TestBonePhysics.cs
+/HSDRawViewer/Tools/Animation/SpringPhysics.cs
