@@ -59,7 +59,7 @@ namespace HSDRawViewer
             vp.Dock = DockStyle.Fill;
             vp.Show(dockPanel);
             //TestRendering test = new TestRendering();
-            //vp.glViewport.AddRenderer(test);
+            vp.glViewport.AddRenderer(new TestPhysicsRendering());
 #endif
 
             _nodePropertyViewer = new PropertyView();

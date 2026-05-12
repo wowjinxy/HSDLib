@@ -225,18 +225,18 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="desc"></param>
         public void InitParams(SBM_DynamicDesc desc)
         {
-            x8 = desc.PARAM1;
-            xc = desc.PARAM2;
-            x10 = desc.PARAM3;
+            x8 = desc.DragMultiplier;
+            xc = desc.StiffnessMultiplier;
+            x10 = desc.GravityLengthCompensation;
 
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
                 DynamicsParamHeap p = PhysicsBones[i];
                 SBM_DynamicParams d = desc.Parameters[i];
-                p.x4C = d.PARAM1;
-                p.x50 = d.PARAM2;
+                p.x4C = d.FollowDamping;
+                p.x50 = d.Stiffness;
                 p.rot_orig = new Vector4(d.RotX, d.RotY, d.RotZ, d.RotW);
-                p.RotationLimit = d.RotLimit;
+                p.RotationLimit = d.RotationLimit;
 
                 p.x6C = d.PARAM8;
                 p.x70 = d.PARAM9;
@@ -246,13 +246,13 @@ namespace HSDRawViewer.Rendering.Animation
                 p.x7C = d.PARAM12;
                 p.x80 = d.PARAM13;
 
-                p.RotMomentumSpeed = d.RotMomentumSpeed;
-                p.MaxAngleChange = d.MaxAngleChange;
+                p.RotMomentumSpeed = d.InertiaDamping;
+                p.MaxAngleChange = d.Resistance;
 
                 if (p.Length == 0)
                     p.length_scale = 0;
                 else
-                    p.length_scale = desc.PARAM3 / p.Length;
+                    p.length_scale = desc.GravityLengthCompensation / p.Length;
             }
         }
 
