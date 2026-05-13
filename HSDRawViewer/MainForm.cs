@@ -55,11 +55,11 @@ namespace HSDRawViewer
             dockPanel.Theme = new VS2015LightTheme();
 
 #if DEBUG
-            var vp = new GUI.Controls.DockableViewport();
-            vp.Dock = DockStyle.Fill;
-            vp.Show(dockPanel);
-            //TestRendering test = new TestRendering();
-            vp.glViewport.AddRenderer(new TestPhysicsRendering());
+            //var vp = new GUI.Controls.DockableViewport();
+            //vp.Dock = DockStyle.Fill;
+            //vp.Show(dockPanel);
+            ////TestRendering test = new TestRendering();
+            //vp.glViewport.AddRenderer(new TestPhysicsRendering());
 #endif
 
             _nodePropertyViewer = new PropertyView();

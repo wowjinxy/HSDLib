@@ -14,9 +14,13 @@ namespace HSDRawViewer.Tools.Physics
 
         public int BoneCount => Bones.Count;
 
+        public int StartBone;
+
         public readonly List<DynamicJoint> Bones = new();
 
         public Vector3 Gravity = new(0, -1, 0);
+
+        public Vector3 Wind = Vector3.Zero;
 
         public float DampingMultiplier;
         public float StiffnessMultiplier;
@@ -49,7 +53,7 @@ namespace HSDRawViewer.Tools.Physics
             CalculateBoneLengthsAndAxes();
         }
 
-        private void CalculateBoneLengthsAndAxes()
+        public void CalculateBoneLengthsAndAxes()
         {
             for (int i = 0; i < Bones.Count - 1; i++)
             {
@@ -58,6 +62,11 @@ namespace HSDRawViewer.Tools.Physics
 
                 current.BoneLength =
                     Vector3.Distance(current.WorldPosition, next.WorldPosition);
+
+                current.InverseBoneLength =
+                    current.BoneLength <= 0
+                    ? 0
+                    : BoneLengthScaleFactor / current.BoneLength;
 
                 Vector3 t = next.Translation;
 
@@ -74,6 +83,7 @@ namespace HSDRawViewer.Tools.Physics
 
         public void InitParams(SBM_DynamicDesc desc)
         {
+            StartBone               = desc.BoneIndex;
             DampingMultiplier       = desc.DragMultiplier;
             StiffnessMultiplier     = desc.StiffnessMultiplier;
             BoneLengthScaleFactor   = desc.GravityLengthCompensation;
@@ -115,17 +125,12 @@ namespace HSDRawViewer.Tools.Physics
 
         public void Think(
             LiveJObj model,
-            List<SBM_DynamicHitBubble> hitBubbles,
-            bool enableGroundCollision,
-            int maxApplyPhysics,
-            int airState)
+            IEnumerable<SBM_DynamicHitBubble> hitBubbles)
         {
             if (ApplyNum > 0x100 || Bones.Count <= 1)
                 return;
 
-            Matrix4 parentMatrix =
-                model.GetJObjFromDesc(Bones[0].Desc)
-                .Parent.WorldTransform;
+            Matrix4 parentMatrix = Bones[0].Live.Parent.WorldTransform;
 
             for (int i = ApplyNum; i < Bones.Count - 1; i++)
             {
@@ -147,7 +152,7 @@ namespace HSDRawViewer.Tools.Physics
             DynamicJoint child,
             ref Matrix4 parentMatrix,
             LiveJObj model,
-            List<SBM_DynamicHitBubble> hitBubbles)
+            IEnumerable<SBM_DynamicHitBubble> hitBubbles)
         {
             Matrix4 translationMatrix =
                 Matrix4.CreateTranslation(bone.Translation);
@@ -195,6 +200,10 @@ namespace HSDRawViewer.Tools.Physics
             ApplyGravity(
                 bone,
                 ref simulatedDirection);
+
+            //ApplyWind(
+            //    bone,
+            //    ref simulatedDirection);
 
             ApplyAngularVelocity(
                 bone,
@@ -264,6 +273,36 @@ namespace HSDRawViewer.Tools.Physics
                 ref direction,
                 targetDirection,
                 1f - strength);
+        }
+
+        private void ApplyWind(
+            DynamicJoint bone,
+            ref Vector3 direction)
+        {
+            if (Wind.LengthSquared <= float.Epsilon)
+                return;
+
+            Vector3 wind = Wind; //.Normalized();
+
+            float angle =
+                Vector3.CalculateAngle(wind, direction);
+
+            if (angle <= 0)
+                return;
+
+            float gravityAngle =
+                Math.Abs(
+                    MathF.Sin(angle) *
+                    bone.InverseBoneLength);
+
+            Vector3 rotationAxis =
+                Vector3.Cross(direction, wind)
+                .Normalized();
+
+            RotateAboutUnitAxis(
+                ref direction,
+                gravityAngle,
+                rotationAxis);
         }
 
         private void ApplyGravity(
@@ -378,7 +417,7 @@ namespace HSDRawViewer.Tools.Physics
             DynamicJoint bone,
             ref Vector3 direction,
             LiveJObj model,
-            List<SBM_DynamicHitBubble> hitBubbles)
+            IEnumerable<SBM_DynamicHitBubble> hitBubbles)
         {
             foreach (SBM_DynamicHitBubble hb in hitBubbles)
             {

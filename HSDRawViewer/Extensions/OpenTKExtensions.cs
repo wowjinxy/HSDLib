@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using OpenTK.Mathematics;
 using System;
+using System.Drawing;
 
 namespace HSDRawViewer
 {
@@ -242,6 +243,15 @@ namespace HSDRawViewer
             // Normalize in case of numerical drift or scale
             forward.Normalize();
             up.Normalize();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static Vector3 ToTKVector(this Color color)
+        {
+            return new Vector3(color.R, color.G, color.B) / 255f;
         }
     }
 }

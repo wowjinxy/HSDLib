@@ -16,7 +16,7 @@ namespace HSDRawViewer.Rendering.Widgets
         Scale = 8,
     }
 
-    public class TranslationWidget
+    public class TranslationWidget : IWidget
     {
         // TODO: option to make x move into negative axis
 
@@ -87,7 +87,7 @@ namespace HSDRawViewer.Rendering.Widgets
         private readonly QuadHitTest YPlane = new();
         private readonly QuadHitTest ZPlane = new();
 
-        public bool Interacting { get; set; }
+        public bool Interacting { get; private set; }
         private bool WasInteracting = false;
 
         public delegate void UpdateTransform(Matrix4 newTransform);

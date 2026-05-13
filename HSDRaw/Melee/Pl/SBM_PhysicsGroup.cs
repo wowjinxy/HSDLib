@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 
 namespace HSDRaw.Melee.Pl
 {
@@ -69,6 +70,11 @@ namespace HSDRaw.Melee.Pl
         public float Y { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
         public float X { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
         public float Size { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+
+        public override string ToString()
+        {
+            return $"B: {BoneIndex} S: {Size} P: ({X}, {Y}, {Z})";
+        }
     }
 
     public class SBM_DynamicDesc : HSDAccessor
@@ -167,36 +173,42 @@ namespace HSDRaw.Melee.Pl
             set => _s.SetFloat(0x18, value);
         }
 
+        [Browsable(false)]
         public float PARAM8
         {
             get => _s.GetFloat(0x1C);
             set => _s.SetFloat(0x1C, value);
         }
 
+        [Browsable(false)]
         public float PARAM9
         {
             get => _s.GetFloat(0x20);
             set => _s.SetFloat(0x20, value);
         }
 
+        [Browsable(false)]
         public float PARAM10
         {
             get => _s.GetFloat(0x24);
             set => _s.SetFloat(0x24, value);
         }
 
+        [Browsable(false)]
         public float PARAM11
         {
             get => _s.GetFloat(0x28);
             set => _s.SetFloat(0x28, value);
         }
 
+        [Browsable(false)]
         public float PARAM12
         {
             get => _s.GetFloat(0x2C);
             set => _s.SetFloat(0x2C, value);
         }
 
+        [Browsable(false)]
         public float PARAM13
         {
             get => _s.GetFloat(0x30);
@@ -217,6 +229,11 @@ namespace HSDRaw.Melee.Pl
         {
             get => _s.GetFloat(0x38);
             set => _s.SetFloat(0x38, value);
+        }
+
+        public override string ToString()
+        {
+            return $"Joint Param";
         }
     }
 }

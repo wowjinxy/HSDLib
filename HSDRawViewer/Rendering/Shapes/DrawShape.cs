@@ -605,5 +605,38 @@ namespace HSDRawViewer.Rendering
             GL.PopMatrix();
         }
 
+
+        /// <summary>
+        /// Draw cone.
+        /// </summary>
+        public static void DrawCone(
+            float height,
+            float radius,
+            int precision,
+            Vector3 color)
+        {
+            GL.Color3(color);
+
+            GL.Begin(PrimitiveType.TriangleFan);
+
+            GL.Vertex3(0, height, 0);
+
+            float twicePi =
+                MathF.PI * 2f;
+
+            for (int i = 0; i <= precision; i++)
+            {
+                float angle =
+                    i * twicePi / precision;
+
+                GL.Vertex3(
+                    MathF.Cos(angle) * radius,
+                    0,
+                    MathF.Sin(angle) * radius);
+            }
+
+            GL.End();
+        }
+
     }
 }

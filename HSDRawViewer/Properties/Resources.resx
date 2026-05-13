@@ -118,122 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="back_checker" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\back_checker.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="doc_kabii" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\doc_kabii.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_anim_joint" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_anim_joint.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_anim_material" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_anim_material.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_anim_shape" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_anim_shape.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_anim_texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_anim_texture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_aobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_aobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_cobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_cobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ico_unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_unknown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ico_coll" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_coll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ico_dobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_dobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_fobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_fobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_folder" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_folder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_fuma" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_fuma.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_group" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_group.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_hatchling" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_hatchling.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_iobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_iobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_jobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_jobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_kabii" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_kabii.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_known" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_known.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_lobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_lobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_mobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_mobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_pobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_pobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_replace" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_replace.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_right" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_right.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_save" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_sobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_sobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_table.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_tobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_tobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ico_unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_unknown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="iso_disc" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\iso_disc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="melee_font" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\melee_font.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_end" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_end.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_fastforward" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_fastforward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_loop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_loop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_no_loop" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_no_loop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pb_play" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ts_importfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_importfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pb_play_reverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pb_play_reverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -241,49 +133,163 @@
   <data name="pb_rewind" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\pb_rewind.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="pb_start" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pb_start.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_add" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_check" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_check.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_clone" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_clone.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_down.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_exportfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_exportfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_hidden" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_hidden.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_importfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_importfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ts_play" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ico_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ts_stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ts_hidden" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_hidden.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="back_checker" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\back_checker.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_replace" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_replace.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_loop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_loop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_group" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_group.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_cobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_cobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ts_subtract" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_subtract.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ts_up" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ts_up.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ico_anim_joint" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_anim_joint.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iso_disc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iso_disc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_kabii" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_kabii.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_anim_texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_anim_texture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_no_loop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_no_loop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_anim_material" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_anim_material.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ts_visible" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_visible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ico_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_exportfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_exportfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_tobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_tobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_hatchling" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_hatchling.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_save" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_right" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_right.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_fastforward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_fastforward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_folder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_folder.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ts_x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_aobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_aobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="doc_kabii" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\doc_kabii.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_jobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_jobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="melee_font" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\melee_font.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_clone" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_clone.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_known" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_known.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_pobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_pobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_lobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_lobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_start" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_start.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_mobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_mobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_add" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_dobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_dobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_sobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_sobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_anim_shape" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_anim_shape.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_play" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_play" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_up" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_up.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_end" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_end.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_fuma" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_fuma.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_check" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_check.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_fobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_fobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_iobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_iobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_table.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_down.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_solid" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_transparent" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_transparent.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

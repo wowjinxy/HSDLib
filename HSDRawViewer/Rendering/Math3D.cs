@@ -168,5 +168,35 @@ namespace HSDRawViewer.Rendering
 
             return normal;
         }
+
+        /// <summary>
+        /// Creates orientation matrix from direction.
+        /// </summary>
+        public static Matrix4 CreateRotationFromDirection(Vector3 dir)
+        {
+            Vector3 forward =
+                dir.Normalized();
+
+            Vector3 up =
+                Math.Abs(Vector3.Dot(
+                    forward,
+                    Vector3.UnitY)) > 0.99f
+                ? Vector3.UnitX
+                : Vector3.UnitY;
+
+            Vector3 right =
+                Vector3.Cross(up, forward).Normalized();
+
+            up =
+                Vector3.Cross(forward, right);
+
+            Matrix4 m = Matrix4.Identity;
+
+            m.Row0 = new Vector4(right, 0);
+            m.Row1 = new Vector4(forward, 0);
+            m.Row2 = new Vector4(up, 0);
+
+            return m;
+        }
     }
 }
