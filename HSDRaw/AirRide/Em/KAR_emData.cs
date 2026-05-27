@@ -29,9 +29,9 @@ namespace HSDRaw.AirRide.Em
 
         public HSDArrayAccessor<KAR_emAnim> AnimBank { get => _s.GetReference<HSDArrayAccessor<KAR_emAnim>>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public KAR_UnkCollisionGroup CollisionGroup { get => _s.GetReference<KAR_UnkCollisionGroup>(0x10); set => _s.SetReference(0x10, value); }
+        public KAR_HurtCollision CollisionGroup { get => _s.GetReference<KAR_HurtCollision>(0x10); set => _s.SetReference(0x10, value); }
 
-        public KAR_UnkCollision CollisionSphere { get => _s.GetReference<KAR_UnkCollision>(0x14); set => _s.SetReference(0x14, value); }
+        public KAR_Hurtbox CollisionSphere { get => _s.GetReference<KAR_Hurtbox>(0x14); set => _s.SetReference(0x14, value); }
     }
 
     public class KAR_emAttributes : HSDAccessor

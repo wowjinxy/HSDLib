@@ -1,33 +1,34 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw.AirRide;
+using HSDRaw.AirRide.Db;
+using HSDRaw.AirRide.Em;
+using HSDRaw.AirRide.Ext;
+using HSDRaw.AirRide.Gr;
+using HSDRaw.AirRide.Gr.Data;
+using HSDRaw.AirRide.Kx;
+using HSDRaw.AirRide.Rd;
+using HSDRaw.AirRide.Vc;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Melee;
+using HSDRaw.Melee.Cmd;
+using HSDRaw.Melee.Ef;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Melee.Mn;
 using HSDRaw.Melee.Pl;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System;
-using HSDRaw.AirRide.Vc;
-using HSDRaw.Melee.Ef;
-using HSDRaw.AirRide.Gr;
-using HSDRaw.AirRide.Gr.Data;
-using System.Diagnostics;
-using HSDRaw.Melee;
-using HSDRaw.MEX;
-using HSDRaw.MEX.Stages;
-using HSDRaw.MEX.Menus;
-using HSDRaw.AirRide.Em;
-using HSDRaw.AirRide.Rd;
-using HSDRaw.AirRide.Kx;
-using HSDRaw.AirRide;
 using HSDRaw.Melee.Pl.ftData;
 using HSDRaw.Melee.Ty;
+using HSDRaw.MEX;
 using HSDRaw.MEX.Akaneia;
 using HSDRaw.MEX.Characters;
-using HSDRaw.Melee.Cmd;
 using HSDRaw.MEX.Cpu;
+using HSDRaw.MEX.Menus;
 using HSDRaw.MEX.Param;
-using HSDRaw.AirRide.Ext;
+using HSDRaw.MEX.Stages;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace HSDRaw
 {
@@ -824,7 +825,7 @@ namespace HSDRaw
                 x => x.StartsWith("grGroundParam") ?  new SBM_GroundParam() : null,
                 x => x.StartsWith("vcDataStar") ?  new KAR_vcDataStar() : null,
                 x => x.StartsWith("vcDataWheel") ?  new KAR_vcDataWheel() : null,
-                x => x.StartsWith("grModelMotion") ?  new KAR_grModelMotion() : null,
+                x => x.StartsWith("grModelMotion") ?  new HSDArrayAccessor<KAR_grModelMotion>() : null,
                 x => x.StartsWith("grModel") ?  new KAR_grModel() : null,
                 x => x.StartsWith("grDataCommon") ?  new KAR_grDataCommon() : null,
                 x => x.StartsWith("grData") ?  new KAR_grData() : null,
@@ -884,6 +885,9 @@ namespace HSDRaw
                 x => x.EndsWith("_tobj") ?  new HSD_TOBJ() : null,
                 x => x.EndsWith("allstar_fighters") ?  new HSDArrayAccessor<MEX_AllStarFigther>() : null,
                 x => x.EndsWith("hud_colors") ?  new HSDNullPointerArrayAccessor<KAR_HudColor>() : null,
+                x => x.EndsWith("_dynamics") ?  new SBM_PhysicsGroup() : null,
+                x => x.EndsWith("rdDataCommon") ?  new KAR_RdDataCommon() : null,
+                x => x.StartsWith("dbEffectData") ?  new KAR_dbEffectData() : null,
                 x => new HSDAccessor(),
         };
 

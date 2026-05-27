@@ -8,7 +8,7 @@
 
         public KAR_vcModelData ModelData { get => _s.GetReference<KAR_vcModelData>(0x4); set => _s.SetReference(0x4, value); }
 
-        public KAR_UnkCollisionGroup UnkCollisionGroup { get => _s.GetReference<KAR_UnkCollisionGroup>(0x8); set => _s.SetReference(0x8, value); }
+        public KAR_HurtCollision UnkCollisionGroup { get => _s.GetReference<KAR_HurtCollision>(0x8); set => _s.SetReference(0x8, value); }
 
         public KAR_vcCollisionAttributes CollisionAttributes { get => _s.GetReference<KAR_vcCollisionAttributes>(0xc); set => _s.SetReference(0xc, value); }
 

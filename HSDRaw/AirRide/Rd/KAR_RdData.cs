@@ -16,11 +16,11 @@ namespace HSDRaw.AirRide.Rd
 
         public HSDArrayAccessor<KAR_RdMotionTable> MotionTables { get => _s.GetReference<HSDArrayAccessor<KAR_RdMotionTable>>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public KAR_UnkCollisionGroup x10 { get => _s.GetReference<KAR_UnkCollisionGroup>(0x10); set => _s.SetReference(0x10, value); }
+        public KAR_HurtCollision x10 { get => _s.GetReference<KAR_HurtCollision>(0x10); set => _s.SetReference(0x10, value); }
 
         public KAR_RdUnknownTable0x14 x14 { get => _s.GetReference<KAR_RdUnknownTable0x14>(0x14); set => _s.SetReference(0x14, value); }
 
-        public KAR_UnkCollision x18 { get => _s.GetReference<KAR_UnkCollision>(0x18); set => _s.SetReference(0x18, value); }
+        public KAR_Hurtbox x18 { get => _s.GetReference<KAR_Hurtbox>(0x18); set => _s.SetReference(0x18, value); }
 
         public HSDAccessor Attribute2 { get => _s.GetReference<HSDAccessor>(0x1C); set => _s.SetReference(0x1C, value); }
 

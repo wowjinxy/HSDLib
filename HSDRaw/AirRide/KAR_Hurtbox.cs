@@ -3,13 +3,13 @@
     /// <summary>
     /// 
     /// </summary>
-    public class KAR_UnkCollisionGroup : HSDAccessor
+    public class KAR_HurtCollision : HSDAccessor
     {
-        public override int TrimmedSize => 0x08;
+        public override int TrimmedSize => 0x0C;
 
-        public HSDArrayAccessor<KAR_UnkCollision> Entries
+        public HSDArrayAccessor<KAR_Hurtbox> Entries
         {
-            get => _s.GetReference<HSDArrayAccessor<KAR_UnkCollision>>(0x00);
+            get => _s.GetReference<HSDArrayAccessor<KAR_Hurtbox>>(0x00);
             set
             {
                 if (value != null)
@@ -27,7 +27,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class KAR_UnkCollision : HSDAccessor
+    public class KAR_Hurtbox : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
 

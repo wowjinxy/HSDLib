@@ -9,7 +9,7 @@
 
         public KAR_grStageNode StageNode { get => _s.GetReference<KAR_grStageNode>(0x4); set => _s.SetReference(0x4, value); }
 
-        public int Unknown2 { get => _s.GetInt32(0x8); set => _s.SetInt32(0x8, value); }
+        public HSDAccessor StageParam { get => _s.GetReference<HSDAccessor>(0x8); set => _s.SetReference(0x8, value); }
 
         // x0C Model Runtime Pointer
 
@@ -37,7 +37,7 @@
 
         public KAR_grFGMNode FGMNode { get => _s.GetReference<KAR_grFGMNode>(0x3C); set => _s.SetReference(0x3C, value); }
 
-        public HSDAccessor YakumonoNode { get => _s.GetReference<HSDAccessor>(0x40); set => _s.SetReference(0x40, value); }
+        public KAR_YakumonoNode YakumonoNode { get => _s.GetReference<KAR_YakumonoNode>(0x40); set => _s.SetReference(0x40, value); }
 
         public HSDAccessor ReplayNode { get => _s.GetReference<HSDAccessor>(0x44); set => _s.SetReference(0x44, value); }
 

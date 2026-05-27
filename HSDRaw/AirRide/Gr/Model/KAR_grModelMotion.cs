@@ -4,7 +4,7 @@ namespace HSDRaw.AirRide.Gr
 {
     public class KAR_grModelMotion : HSDAccessor
     {
-        public override int TrimmedSize => 8;
+        public override int TrimmedSize => 0x14;
 
         public HSD_AnimJoint AnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x00); set => _s.SetReference(0x00, value); }
 

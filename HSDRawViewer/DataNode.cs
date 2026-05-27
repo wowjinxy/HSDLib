@@ -240,7 +240,7 @@ namespace HSDRawViewer
                             if (!labeledNodes.ContainsKey(a._s))
                                 labeledNodes.Add(a._s, null);
 
-                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}_({prop.PropertyType.Name})"), a)
+                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"[{index}]: ({prop.PropertyType.Name})"), a)
                             {
                                 IsArrayMember = true,
                                 ArrayName = prop.Name,

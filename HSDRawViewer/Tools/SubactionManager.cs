@@ -161,6 +161,7 @@ namespace HSDRawViewer.Tools
         // KAR
         Rider,
         Weapon,
+        Yakumono,
     }
 
     public class SubactionManager
@@ -258,8 +259,9 @@ namespace HSDRawViewer.Tools
             string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_color.yml");
             string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_custom.yml");
             string customItemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_custom_item.yml");
-            string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_rider.yml");
-            string weaponPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_weapon.yml");
+
+            string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_kar_rider.yml");
+            string weaponPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_kar_weapon.yml");
 
             if (File.Exists(controlPath))
                 sa = File.ReadAllText(controlPath);

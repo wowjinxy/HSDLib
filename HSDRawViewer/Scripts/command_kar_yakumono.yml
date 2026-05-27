@@ -1,0 +1,57 @@
+﻿- code: 10
+  name: Unused10
+  parameters:
+  - name: Padding
+    bitCount: 26
+
+- code: 11
+  name: Unused11
+  parameters:
+  - name: Padding
+    bitCount: 26
+
+- code: 12
+  name: CreateHitbox
+  parameters:
+  - name: Padding
+    bitCount: 26
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+
+- code: 13
+  name: ClearHitboxes
+  parameters:
+  - name: Padding
+    bitCount: 26
+
+- code: 14
+  name: Create Effect
+  parameters:
+  - name: Padding
+    bitCount: 26
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+  - name: Padding
+    bitCount: 32
+
+- code: 15
+  name: Unused11
+  parameters:
+  - name: Padding
+    bitCount: 26
+  - name: Padding
+    bitCount: 32

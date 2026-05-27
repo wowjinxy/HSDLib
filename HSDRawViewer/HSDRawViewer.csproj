@@ -136,7 +136,10 @@
     <None Update="Scripts\command_cpu.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Scripts\command_weapon.yml">
+    <None Update="Scripts\command_kar_weapon.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Scripts\command_kar_yakumono.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Shader\ps.frag">
@@ -145,7 +148,7 @@
     <None Update="Shader\ps.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Scripts\command_rider.yml">
+    <None Update="Scripts\command_kar_rider.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\command_color.yml">
