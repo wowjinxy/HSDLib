@@ -898,7 +898,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void loadGrModelToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+            string modelFileName = System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat");
+            string f = MainForm.Instance.ResolveProjectFile(modelFileName) ??
+                Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+
             if (f != null)
             {
                 HSDRawFile file = new(f);

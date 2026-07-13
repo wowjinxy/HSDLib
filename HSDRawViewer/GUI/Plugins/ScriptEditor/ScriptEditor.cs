@@ -518,10 +518,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private bool LoadKirbyAnimationFiles()
         {
-            string kbdtPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKb.dat";
-            string kbnrPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKbNr.dat";
+            string kbdtPath = MainForm.Instance.ResolveProjectFile("PlKb.dat");
+            string kbnrPath = MainForm.Instance.ResolveProjectFile("PlKbNr.dat");
 
-            if (!File.Exists(kbdtPath) || !File.Exists(kbnrPath))
+            if (string.IsNullOrEmpty(kbdtPath) || string.IsNullOrEmpty(kbnrPath) ||
+                !File.Exists(kbdtPath) || !File.Exists(kbnrPath))
                 return false;
 
             HSDRawFile kbFile = new(kbdtPath);
@@ -549,12 +550,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void LoadFighterAnimationFiles()
         {
-            string aFile = MainForm.Instance.FilePath.Replace(".dat", "AJ.dat");
-            string cFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
+            string aFile = MainForm.Instance.ResolveProjectFile(MainForm.Instance.FilePath.Replace(".dat", "AJ.dat"));
+            string cFile = MainForm.Instance.ResolveProjectFile(MainForm.Instance.FilePath.Replace(".dat", "Nr.dat"));
 
             // try to automatically locate files
             bool openFiles = true;
-            if (File.Exists(aFile) && File.Exists(cFile))
+            if (!string.IsNullOrEmpty(aFile) && !string.IsNullOrEmpty(cFile) &&
+                File.Exists(aFile) && File.Exists(cFile))
             {
                 DialogResult r = MessageBox.Show($"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", "Open Files", MessageBoxButtons.YesNoCancel);
 
@@ -581,13 +583,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             AJManager = new FighterAJManager(File.ReadAllBytes(aFile));
 
             // item data
-            string itcoPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\ItCo.dat";
-            if (File.Exists(itcoPath))
+            string itcoPath = MainForm.Instance.ResolveProjectFile("ItCo.dat");
+            if (!string.IsNullOrEmpty(itcoPath) && File.Exists(itcoPath))
                 ItCo = new HSDRawFile(itcoPath);
 
             // dummy model
-            string dummyPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlMrNr.dat";
-            if (File.Exists(dummyPath))
+            string dummyPath = MainForm.Instance.ResolveProjectFile("PlMrNr.dat");
+            if (!string.IsNullOrEmpty(dummyPath) && File.Exists(dummyPath))
                 renderer.LoadThrowDummy(dummyPath);
 
             // load model
@@ -632,7 +634,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 _table.Commands = _actionList.ToActions().ToArray();
 
             // dump to file
-            File.WriteAllBytes(AJFilePath, newAJFile);
+            string savePath = MainForm.Instance.GetProjectSavePath(AJFilePath);
+            File.WriteAllBytes(savePath, newAJFile);
+            AJFilePath = savePath;
+            MainForm.Instance.RefreshProjectExplorer();
         }
 
         /// <summary>
@@ -641,18 +646,18 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private void LoadDemoAnimationFiles()
         {
             // attempt to automatically locate files
-            string modelFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
+            string modelFile = MainForm.Instance.ResolveProjectFile(MainForm.Instance.FilePath.Replace(".dat", "Nr.dat"));
 
             string path = Path.GetDirectoryName(MainForm.Instance.FilePath);
             string fighterKey = Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath).Replace("Pl", "");
             string fighterName = _node.Parent.Text.Replace("ftData", "");
 
-            ResultFilePath = Path.Combine(path, $"GmRstM{fighterKey}.dat");
-            WaitFilePath = Path.Combine(path, $"Pl{fighterKey}DViWaitAJ.dat");
-            IntroFilePath = Path.Combine(path, $"ftDemoIntro{fighterName}.dat");
-            EndingFilePath = Path.Combine(path, $"ftDemoEnding{fighterName}.dat");
+            ResultFilePath = MainForm.Instance.ResolveProjectFile($"GmRstM{fighterKey}.dat") ?? Path.Combine(path, $"GmRstM{fighterKey}.dat");
+            WaitFilePath = MainForm.Instance.ResolveProjectFile($"Pl{fighterKey}DViWaitAJ.dat") ?? Path.Combine(path, $"Pl{fighterKey}DViWaitAJ.dat");
+            IntroFilePath = MainForm.Instance.ResolveProjectFile($"ftDemoIntro{fighterName}.dat") ?? Path.Combine(path, $"ftDemoIntro{fighterName}.dat");
+            EndingFilePath = MainForm.Instance.ResolveProjectFile($"ftDemoEnding{fighterName}.dat") ?? Path.Combine(path, $"ftDemoEnding{fighterName}.dat");
 
-            if (!File.Exists(modelFile))
+            if (string.IsNullOrEmpty(modelFile) || !File.Exists(modelFile))
                 modelFile = FileIO.OpenFile("Fighter Model (Pl**Nr.dat)|*.dat", $"Pl{fighterKey}Nr.dat");
 
             if (string.IsNullOrEmpty(modelFile))
@@ -745,8 +750,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             // load or create file
             HSDRawFile file = null;
-            if (File.Exists(ajpath))
-                file = new HSDRawFile(ajpath);
+            string readPath = MainForm.Instance.ResolveProjectFile(ajpath) ?? ajpath;
+            string savePath = MainForm.Instance.GetProjectSavePath(ajpath);
+
+            if (File.Exists(readPath))
+                file = new HSDRawFile(readPath);
             else
                 file = new HSDRawFile();
 
@@ -767,7 +775,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //}
 
             // save file
-            file.Save(ajpath);
+            file.Save(savePath);
+            MainForm.Instance.RefreshProjectExplorer();
 
             return true;
         }
@@ -885,7 +894,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (exportTXTOnSaveToolStripMenuItem.Checked)
             {
                 string newPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "_" + _node.Text + ".txt");
-                ExportAsText(newPath);
+                ExportAsText(MainForm.Instance.GetProjectSavePath(newPath));
             }
         }
 

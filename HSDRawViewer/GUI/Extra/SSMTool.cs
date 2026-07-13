@@ -88,7 +88,7 @@ namespace HSDRawViewer.GUI.Extra
                 FilePath = FileIO.SaveFile("SSM (*.ssm)|*.ssm");
 
             if (FilePath != null)
-                Save(FilePath);
+                Save(MainForm.Instance?.GetProjectSavePath(FilePath) ?? FilePath);
         }
 
         /// <summary>

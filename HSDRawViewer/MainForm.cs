@@ -11,6 +11,7 @@ using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -35,6 +36,16 @@ namespace HSDRawViewer
 
         private IDockContent LastActiveContent = null;
 
+        private ProjectWorkspace Project = null;
+
+        private ProjectExplorer _projectExplorer = null;
+
+        private string CurrentProjectRelativePath = null;
+
+        private ToolStripMenuItem _openProjectFolderToolStripMenuItem;
+
+        private ToolStripMenuItem _closeProjectToolStripMenuItem;
+
         public static void Init()
         {
             if (Instance == null)
@@ -49,6 +60,7 @@ namespace HSDRawViewer
         public MainForm()
         {
             InitializeComponent();
+            InstallProjectMenuItems();
 
             IsMdiContainer = true;
 
@@ -176,6 +188,21 @@ namespace HSDRawViewer
 
         }
 
+        private void InstallProjectMenuItems()
+        {
+            _openProjectFolderToolStripMenuItem = new ToolStripMenuItem("Open Project Folder");
+            _openProjectFolderToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.O;
+            _openProjectFolderToolStripMenuItem.Click += openProjectFolderToolStripMenuItem_Click;
+
+            _closeProjectToolStripMenuItem = new ToolStripMenuItem("Close Project");
+            _closeProjectToolStripMenuItem.Enabled = false;
+            _closeProjectToolStripMenuItem.Click += closeProjectToolStripMenuItem_Click;
+
+            fileToolStripMenuItem.DropDownItems.Insert(1, _openProjectFolderToolStripMenuItem);
+            fileToolStripMenuItem.DropDownItems.Insert(2, _closeProjectToolStripMenuItem);
+            fileToolStripMenuItem.DropDownItems.Insert(3, new ToolStripSeparator());
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -236,10 +263,16 @@ namespace HSDRawViewer
         /// <param name="filePath"></param>
         public void OpenFile(string filePath)
         {
-            FilePath = filePath;
+            OpenFile(filePath, null);
+        }
+
+        private void OpenFile(string readPath, string projectRelativePath)
+        {
+            CurrentProjectRelativePath = projectRelativePath;
+            FilePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
 
             RawHSDFile = new HSDRawFile();
-            RawHSDFile.Open(filePath);
+            RawHSDFile.Open(readPath);
             RefreshTree();
 
 #if !DEBUG
@@ -259,7 +292,157 @@ namespace HSDRawViewer
             }
 #endif
 
-            Text = "HSD DAT Browser - " + filePath;
+            UpdateWindowTitle(readPath);
+        }
+
+        public void OpenProjectFile(string relativePath)
+        {
+            if (Project == null)
+                return;
+
+            if (!Project.IsSupportedOpenFile(relativePath))
+            {
+                MessageBox.Show("No viewer is registered for this project file.", "Unsupported Project File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string readPath = Project.GetEffectiveReadPath(relativePath);
+            if (!File.Exists(readPath))
+            {
+                MessageBox.Show("The selected project file does not exist.", "Missing Project File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string extension = Path.GetExtension(relativePath).ToLowerInvariant();
+            if (extension == ".ssm" || extension == ".sdi")
+            {
+                SSMTool d = new();
+                d.Show();
+                d.OpenFile(readPath);
+                d.BringToFront();
+                return;
+            }
+
+            if (extension == ".sem")
+            {
+                SEMEditorTool d = new();
+                d.Show();
+                d.OpenSEMFile(readPath);
+                d.BringToFront();
+                return;
+            }
+
+            OpenFile(readPath, relativePath);
+        }
+
+        public string ResolveProjectFile(string pathOrFileName)
+        {
+            if (string.IsNullOrEmpty(pathOrFileName))
+                return null;
+
+            if (Project == null)
+            {
+                if (Path.IsPathRooted(pathOrFileName))
+                    return File.Exists(pathOrFileName) ? pathOrFileName : null;
+
+                if (!string.IsNullOrEmpty(FilePath))
+                {
+                    string localPath = Path.Combine(Path.GetDirectoryName(FilePath), pathOrFileName);
+                    if (File.Exists(localPath))
+                        return localPath;
+                }
+
+                return File.Exists(pathOrFileName) ? pathOrFileName : null;
+            }
+
+            if (Path.IsPathRooted(pathOrFileName))
+            {
+                if (Project.TryGetRelativePath(pathOrFileName, out string relativePath))
+                    return Project.FileExists(relativePath) ? Project.GetEffectiveReadPath(relativePath) : null;
+
+                return File.Exists(pathOrFileName) ? pathOrFileName : null;
+            }
+
+            if (!string.IsNullOrEmpty(CurrentProjectRelativePath))
+            {
+                string relativeDirectory = Path.GetDirectoryName(CurrentProjectRelativePath);
+                string relativePath = string.IsNullOrEmpty(relativeDirectory) ?
+                    pathOrFileName :
+                    Path.Combine(relativeDirectory, pathOrFileName);
+
+                if (Project.FileExists(relativePath))
+                    return Project.GetEffectiveReadPath(relativePath);
+            }
+
+            string foundRelativePath = Project.FindFirstRelativeByFileName(Path.GetFileName(pathOrFileName));
+            if (foundRelativePath != null)
+                return Project.GetEffectiveReadPath(foundRelativePath);
+
+            return null;
+        }
+
+        public string GetProjectSavePath(string path)
+        {
+            if (Project == null || string.IsNullOrEmpty(path))
+                return path;
+
+            if (Project.TryGetRelativePath(path, out string relativePath))
+                return Project.GetOutputPath(relativePath);
+
+            if (!string.IsNullOrEmpty(CurrentProjectRelativePath) &&
+                string.Equals(path, FilePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return Project.GetOutputPath(CurrentProjectRelativePath);
+            }
+
+            return path;
+        }
+
+        private string GetProjectOutputPathForCurrentFile()
+        {
+            if (Project == null)
+                return null;
+
+            if (!string.IsNullOrEmpty(CurrentProjectRelativePath))
+                return Project.GetOutputPath(CurrentProjectRelativePath);
+
+            if (!string.IsNullOrEmpty(FilePath) && Project.TryGetRelativePath(FilePath, out string relativePath))
+                return Project.GetOutputPath(relativePath);
+
+            return null;
+        }
+
+        public bool ValidateProjectWritePath(string path)
+        {
+            if (Project != null && !string.IsNullOrEmpty(path) && Project.IsSourcePath(path))
+            {
+                MessageBox.Show(
+                    "Project mode never writes into the extracted source folder. Choose a path outside the source tree or use Save to write into the mod output folder.",
+                    "Protected Project Source",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void UpdateWindowTitle(string readPath = null)
+        {
+            if (Project == null)
+            {
+                Text = FilePath == null ? "HSD DAT Browser" : "HSD DAT Browser - " + FilePath;
+                return;
+            }
+
+            string fileText = CurrentProjectRelativePath ?? Path.GetFileName(readPath ?? FilePath);
+            Text = $"HSD DAT Browser - {fileText} [{Project.Name}]";
+        }
+
+        public void RefreshProjectExplorer()
+        {
+            if (_projectExplorer != null && !_projectExplorer.IsDisposed)
+                _projectExplorer.RefreshProject();
         }
 
         /// <summary>
@@ -296,6 +479,88 @@ namespace HSDRawViewer
             }
         }
 
+        private void openProjectFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string sourceRoot = Tools.FileIO.OpenFolder("Select the extracted game folder");
+            if (sourceRoot != null)
+                OpenProjectFolder(sourceRoot);
+        }
+
+        private void closeProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CloseProjectFolder();
+        }
+
+        private void OpenProjectFolder(string sourceRoot, bool confirmLoss = true)
+        {
+            if (confirmLoss &&
+                RawHSDFile.Roots.Count != 0 &&
+                MessageBox.Show("Current unsaved changes will be lost", "Open Project?", MessageBoxButtons.YesNo) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            sourceRoot = ProjectWorkspace.NormalizeDirectory(sourceRoot);
+            string defaultOutputRoot = Path.Combine(Path.GetDirectoryName(sourceRoot), Path.GetFileName(sourceRoot) + "_mod");
+            string outputRoot = Tools.FileIO.OpenFolder("Select the mod output folder", defaultOutputRoot);
+
+            if (outputRoot == null)
+                return;
+
+            outputRoot = ProjectWorkspace.NormalizeDirectory(outputRoot);
+            if (ProjectWorkspace.IsSamePath(sourceRoot, outputRoot) ||
+                ProjectWorkspace.IsPathInDirectory(outputRoot, sourceRoot) ||
+                ProjectWorkspace.IsPathInDirectory(sourceRoot, outputRoot))
+            {
+                MessageBox.Show(
+                    "The mod output folder must be separate from the extracted source folder.",
+                    "Invalid Project Output",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            Project = new ProjectWorkspace(sourceRoot, outputRoot);
+            CurrentProjectRelativePath = null;
+            FilePath = null;
+            RawHSDFile = new HSDRawFile();
+            RefreshTree();
+
+            if (_projectExplorer != null && !_projectExplorer.IsDisposed)
+                _projectExplorer.Close();
+
+            _projectExplorer = new ProjectExplorer(Project);
+            _projectExplorer.FormClosed += projectExplorer_FormClosed;
+            _projectExplorer.Show(dockPanel, DockState.DockLeft);
+
+            _closeProjectToolStripMenuItem.Enabled = true;
+            UpdateWindowTitle();
+        }
+
+        private void projectExplorer_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (ReferenceEquals(sender, _projectExplorer))
+                _projectExplorer = null;
+        }
+
+        private void CloseProjectFolder()
+        {
+            CurrentProjectRelativePath = null;
+            Project = null;
+            FilePath = null;
+            RawHSDFile = new HSDRawFile();
+
+            if (_projectExplorer != null && !_projectExplorer.IsDisposed)
+            {
+                _projectExplorer.Close();
+                _projectExplorer = null;
+            }
+
+            _closeProjectToolStripMenuItem.Enabled = false;
+            RefreshTree();
+            UpdateWindowTitle();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -303,11 +568,21 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath), "Save File As");
+            string projectOutputPath = GetProjectOutputPathForCurrentFile();
+            string defaultName = Path.GetFileName(projectOutputPath ?? FilePath);
+            string initialDirectory = projectOutputPath == null ? null : Path.GetDirectoryName(projectOutputPath);
+
+            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", defaultName, "Save File As", initialDirectory);
             if (f != null)
             {
+                if (!ValidateProjectWritePath(f))
+                    return;
+
                 RawHSDFile.Save(f);
-                OpenFile(f);
+                if (Project != null && Project.TryGetRelativePath(f, out string relativePath) && Project.IsOutputPath(f))
+                    OpenFile(f, relativePath);
+                else
+                    OpenFile(f);
             }
         }
 
@@ -325,8 +600,16 @@ namespace HSDRawViewer
                 }
             }
 
-            if (RawHSDFile != null)
-                RawHSDFile.Save(FilePath);
+            if (RawHSDFile != null && !string.IsNullOrEmpty(FilePath))
+            {
+                string savePath = GetProjectSavePath(FilePath);
+                if (!ValidateProjectWritePath(savePath))
+                    return;
+
+                RawHSDFile.Save(savePath);
+                RefreshProjectExplorer();
+                UpdateWindowTitle(savePath);
+            }
         }
 
         /// <summary>
@@ -336,14 +619,24 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath));
+            string projectOutputPath = GetProjectOutputPathForCurrentFile();
+            string defaultName = Path.GetFileName(projectOutputPath ?? FilePath);
+            string initialDirectory = projectOutputPath == null ? null : Path.GetDirectoryName(projectOutputPath);
+
+            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", defaultName, "Save File", initialDirectory);
             if (f != null)
             {
+                if (!ValidateProjectWritePath(f))
+                    return;
+
                 RawHSDFile.Save(f, false, false);
 
                 if (MessageBox.Show("Reload File?", "Reload File to Update Location Offsets?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    OpenFile(f);
+                    if (Project != null && Project.TryGetRelativePath(f, out string relativePath) && Project.IsOutputPath(f))
+                        OpenFile(f, relativePath);
+                    else
+                        OpenFile(f);
                 }
             }
         }
@@ -483,7 +776,7 @@ namespace HSDRawViewer
                 if (c is SaveableEditorBase save)
                     save.ForceClose = true;
 
-                if (c is DockContent dc && c != _nodePropertyViewer)
+                if (c is DockContent dc && c != _nodePropertyViewer && c != _projectExplorer)
                 {
                     ToRemove.Add(dc);
                 }
@@ -690,6 +983,9 @@ namespace HSDRawViewer
             if (RawHSDFile.Roots.Count == 0 || MessageBox.Show("Current unsaved changes will be lost", "Open File?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                if (s.Length > 0 && Directory.Exists(s[0]))
+                    OpenProjectFolder(s[0], false);
+                else
                 if (s.Length > 0)
                     OpenFile(s[0]);
             }

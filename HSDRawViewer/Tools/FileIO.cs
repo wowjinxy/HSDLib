@@ -16,9 +16,13 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         /// 
 
-        public static string OpenFolder()
+        public static string OpenFolder(string description = "", string selectedPath = "")
         {
             using FolderBrowserDialog fbd = new();
+            fbd.Description = description;
+            if (!string.IsNullOrEmpty(selectedPath))
+                fbd.SelectedPath = selectedPath;
+
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
@@ -84,7 +88,7 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static string SaveFile(string filter, string defaultName, string caption = "Save File")
+        public static string SaveFile(string filter, string defaultName, string caption = "Save File", string initialDirectory = null)
         {
             using SaveFileDialog d = new();
             d.Title = caption;
@@ -92,6 +96,11 @@ namespace HSDRawViewer.Tools
 
             d.FileName = defaultName;
 
+            if (initialDirectory != null)
+            {
+                d.InitialDirectory = initialDirectory;
+            }
+            else
             if (PrevSaveLocation != null)
             {
                 d.InitialDirectory = PrevSaveLocation;
@@ -99,6 +108,12 @@ namespace HSDRawViewer.Tools
 
             if (d.ShowDialog() == DialogResult.OK)
             {
+                if (HSDRawViewer.MainForm.Instance != null &&
+                    !HSDRawViewer.MainForm.Instance.ValidateProjectWritePath(d.FileName))
+                {
+                    return null;
+                }
+
                 PrevSaveLocation = Path.GetDirectoryName(d.FileName);
                 return d.FileName;
             }

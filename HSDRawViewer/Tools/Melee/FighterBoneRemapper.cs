@@ -29,17 +29,19 @@ namespace HSDRawViewer.Tools.Melee
 
                 if (!string.IsNullOrEmpty(filePath))
                 {
+                    string readPath = HSDRawViewer.MainForm.Instance?.ResolveProjectFile(filePath) ?? filePath;
+
                     // check if data or file
-                    var f = new HSDRawFile(filePath);
+                    var f = new HSDRawFile(readPath);
                     Animation = new FighterAJManager();
                     if (f.Roots[0].Name.Contains("_figatree"))
                     {
-                        Animation.ScanAJData(File.ReadAllBytes(filePath));
+                        Animation.ScanAJData(File.ReadAllBytes(readPath));
                     }
                     else
                     {
                         AJFile = f;
-                        Animation.ScanAJFile(filePath);
+                        Animation.ScanAJFile(readPath);
                     }
                 }
             }
@@ -104,15 +106,18 @@ namespace HSDRawViewer.Tools.Melee
                 }
 
                 var rebuilt = Animation.RebuildAJFile(symbols, true);
+                string savePath = HSDRawViewer.MainForm.Instance?.GetProjectSavePath(FilePath) ?? FilePath;
                 if (AJFile != null)
                 {
                     AJFile.Roots[0].Data._s.SetData(rebuilt);
-                    AJFile.Save(FilePath);
+                    AJFile.Save(savePath);
                 }
                 else
                 {
-                    File.WriteAllBytes(FilePath, rebuilt);
+                    File.WriteAllBytes(savePath, rebuilt);
                 }
+
+                HSDRawViewer.MainForm.Instance?.RefreshProjectExplorer();
 
                 return true;
             }
