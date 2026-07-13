@@ -31,6 +31,8 @@ namespace HSDRawViewer
 
         private HSDRawFile RawHSDFile = new();
 
+        private A2DPackage CurrentA2DPackage = null;
+
         public static DataNode SelectedDataNode { get; internal set; } = null;
 
         public static bool RefreshNode = false;
@@ -47,6 +49,8 @@ namespace HSDRawViewer
 
         private ToolStripMenuItem _closeProjectToolStripMenuItem;
 
+        private ContextMenuStrip _a2DPackageContextMenu;
+
         public static void Init()
         {
             if (Instance == null)
@@ -62,6 +66,7 @@ namespace HSDRawViewer
         {
             InitializeComponent();
             InstallProjectMenuItems();
+            InstallA2DPackageContextMenu();
 
             IsMdiContainer = true;
 
@@ -136,34 +141,43 @@ namespace HSDRawViewer
 
             treeView1.AfterExpand += (sender, args) =>
             {
-                args.Node.Nodes.Clear();
-                treeView1.BeginUpdate();
                 if (args.Node is DataNode node)
                 {
+                    args.Node.Nodes.Clear();
+                    treeView1.BeginUpdate();
                     node.ExpandData();
+                    treeView1.EndUpdate();
                 }
-                treeView1.EndUpdate();
             };
 
             treeView1.AfterCollapse += (sender, args) =>
             {
-                treeView1.BeginUpdate();
-                args.Node.Nodes.Clear();
-                args.Node.Nodes.Add(new TreeNode());
-                treeView1.EndUpdate();
+                if (args.Node is DataNode)
+                {
+                    treeView1.BeginUpdate();
+                    args.Node.Nodes.Clear();
+                    args.Node.Nodes.Add(new TreeNode());
+                    treeView1.EndUpdate();
+                }
             };
 
             treeView1.AfterSelect += (sender, args) =>
             {
-                SelectNode<HSDAccessor>();
+                SelectCurrentTreeNode();
             };
 
             treeView1.NodeMouseClick += (sender, args) =>
             {
-                treeView1.SelectedNode = treeView1.GetNodeAt(args.Location);
-                if (args.Button == MouseButtons.Right && args.Node != null && args.Node is DataNode node)
+                TreeNode clickedNode = treeView1.GetNodeAt(args.Location);
+                treeView1.SelectedNode = clickedNode;
+                if (args.Button == MouseButtons.Right && clickedNode is DataNode node)
                 {
                     PluginManager.GetContextMenuFromType(node.Accessor.GetType()).Show(this, args.Location);
+                }
+                else
+                if (args.Button == MouseButtons.Right && clickedNode is A2DPackageNode or A2DPackageEntryNode)
+                {
+                    _a2DPackageContextMenu.Show(this, args.Location);
                 }
                 try
                 {
@@ -202,6 +216,81 @@ namespace HSDRawViewer
             fileToolStripMenuItem.DropDownItems.Insert(1, _openProjectFolderToolStripMenuItem);
             fileToolStripMenuItem.DropDownItems.Insert(2, _closeProjectToolStripMenuItem);
             fileToolStripMenuItem.DropDownItems.Insert(3, new ToolStripSeparator());
+        }
+
+        private void InstallA2DPackageContextMenu()
+        {
+            _a2DPackageContextMenu = new ContextMenuStrip();
+
+            ToolStripMenuItem savePackage = new("Save Package");
+            savePackage.Click += (sender, args) => SaveA2DPackage();
+
+            ToolStripMenuItem savePackageAs = new("Save Package As");
+            savePackageAs.Click += (sender, args) => SaveA2DPackageAs();
+
+            ToolStripMenuItem exportResource = new("Export Resource");
+            exportResource.Click += (sender, args) => ExportSelectedA2DResource();
+
+            ToolStripMenuItem replaceResource = new("Replace Resource (Same Size)");
+            replaceResource.Click += (sender, args) => ReplaceSelectedA2DResource();
+
+            _a2DPackageContextMenu.Opening += (sender, args) =>
+            {
+                bool hasPackage = GetSelectedA2DPackageNode() != null;
+                bool hasEntry = treeView1.SelectedNode is A2DPackageEntryNode;
+
+                savePackage.Enabled = hasPackage;
+                savePackageAs.Enabled = hasPackage;
+                exportResource.Enabled = hasEntry;
+                replaceResource.Enabled = hasEntry;
+            };
+
+            _a2DPackageContextMenu.Items.Add(exportResource);
+            _a2DPackageContextMenu.Items.Add(replaceResource);
+            _a2DPackageContextMenu.Items.Add("-");
+            _a2DPackageContextMenu.Items.Add(savePackage);
+            _a2DPackageContextMenu.Items.Add(savePackageAs);
+        }
+
+        private A2DPackageNode GetSelectedA2DPackageNode()
+        {
+            return treeView1.SelectedNode switch
+            {
+                A2DPackageNode packageNode => packageNode,
+                A2DPackageEntryNode entryNode => entryNode.PackageNode,
+                _ => null,
+            };
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="cast"></param>
+        private void SelectCurrentTreeNode()
+        {
+            if (treeView1.SelectedNode is DataNode)
+            {
+                SelectNode<HSDAccessor>();
+                return;
+            }
+
+            SelectedDataNode = null;
+            _nodePropertyViewer.ClearNode();
+
+            if (treeView1.SelectedNode is A2DPackageEntryNode entryNode)
+            {
+                A2DPackageEntry entry = entryNode.Entry;
+                LocationLabel.Text = $"A2D Resource: 0x{entry.DataOffset:X8} - 0x{entry.DataOffset + entry.Size:X8} ({entry.Size} bytes) -> {entryNode.FullPath}";
+            }
+            else
+            if (treeView1.SelectedNode is A2DPackageNode packageNode)
+            {
+                LocationLabel.Text = $"A2D Package: {packageNode.Package.Entries.Count} resources, 0x{packageNode.Package.Data.Length:X} bytes -> {packageNode.FullPath}";
+            }
+            else
+            {
+                LocationLabel.Text = "Location:";
+            }
         }
 
         /// <summary>
@@ -290,6 +379,7 @@ namespace HSDRawViewer
             CurrentProjectRelativePath = projectRelativePath;
             FilePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
             RawHSDFile = openedFile;
+            CurrentA2DPackage = null;
             RefreshTree();
 
 #if !DEBUG
@@ -314,14 +404,15 @@ namespace HSDRawViewer
 
         private bool TryOpenA2DPackage(string readPath, string projectRelativePath)
         {
-            if (!A2DPackage.IsA2DPackage(readPath))
+            if (!A2DPackage.TryOpen(readPath, out A2DPackage package, out _))
                 return false;
 
-            string savePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
-            A2DPackageTool d = new();
-            d.Show();
-            d.OpenPackage(readPath, savePath);
-            d.BringToFront();
+            CurrentProjectRelativePath = projectRelativePath;
+            FilePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
+            RawHSDFile = new HSDRawFile();
+            CurrentA2DPackage = package;
+            RefreshTree();
+            UpdateWindowTitle(readPath);
             return true;
         }
 
@@ -442,6 +533,89 @@ namespace HSDRawViewer
             return null;
         }
 
+        private bool HasOpenContent()
+        {
+            return RawHSDFile.Roots.Count != 0 || CurrentA2DPackage != null;
+        }
+
+        private void SaveA2DPackage()
+        {
+            if (CurrentA2DPackage == null || string.IsNullOrEmpty(FilePath))
+                return;
+
+            string savePath = GetProjectSavePath(FilePath);
+            if (!ValidateProjectWritePath(savePath))
+                return;
+
+            CurrentA2DPackage.Save(savePath);
+            RefreshProjectExplorer();
+            RefreshA2DTreeState();
+            UpdateWindowTitle(savePath);
+        }
+
+        private void SaveA2DPackageAs()
+        {
+            if (CurrentA2DPackage == null)
+                return;
+
+            string projectOutputPath = GetProjectOutputPathForCurrentFile();
+            string defaultName = Path.GetFileName(projectOutputPath ?? FilePath);
+            string initialDirectory = projectOutputPath == null ? null : Path.GetDirectoryName(projectOutputPath);
+
+            string f = Tools.FileIO.SaveFile("A2D DAT (*.dat)|*.dat|All Files (*.*)|*.*", defaultName, "Save A2D Package As", initialDirectory);
+            if (f == null)
+                return;
+
+            CurrentA2DPackage.Save(f);
+            RefreshProjectExplorer();
+
+            if (Project != null && Project.TryGetRelativePath(f, out string relativePath) && Project.IsOutputPath(f))
+                OpenFile(f, relativePath);
+            else
+                OpenFile(f);
+        }
+
+        private void ExportSelectedA2DResource()
+        {
+            if (treeView1.SelectedNode is not A2DPackageEntryNode entryNode)
+                return;
+
+            string f = Tools.FileIO.SaveFile("All Files (*.*)|*.*", entryNode.Entry.Name, "Export A2D Resource");
+            if (f == null)
+                return;
+
+            File.WriteAllBytes(f, CurrentA2DPackage.GetEntryData(entryNode.Entry.Index));
+        }
+
+        private void ReplaceSelectedA2DResource()
+        {
+            if (treeView1.SelectedNode is not A2DPackageEntryNode entryNode)
+                return;
+
+            string f = Tools.FileIO.OpenFile("All Files (*.*)|*.*", entryNode.Entry.Name);
+            if (f == null)
+                return;
+
+            if (!CurrentA2DPackage.ReplaceEntry(entryNode.Entry.Index, f, out string error))
+            {
+                MessageBox.Show(error, "Replace A2D Resource", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            RefreshA2DTreeState();
+            SelectCurrentTreeNode();
+        }
+
+        private void RefreshA2DTreeState()
+        {
+            if (treeView1.Nodes.Count > 0 && treeView1.Nodes[0] is A2DPackageNode packageNode)
+            {
+                packageNode.FilePath = FilePath;
+                packageNode.UpdateText();
+                packageNode.Expand();
+            }
+        }
+
         public bool ValidateProjectWritePath(string path)
         {
             if (Project != null && !string.IsNullOrEmpty(path) && Project.IsSourcePath(path))
@@ -524,7 +698,7 @@ namespace HSDRawViewer
         private void OpenProjectFolder(string sourceRoot, bool confirmLoss = true)
         {
             if (confirmLoss &&
-                RawHSDFile.Roots.Count != 0 &&
+                HasOpenContent() &&
                 MessageBox.Show("Current unsaved changes will be lost", "Open Project?", MessageBoxButtons.YesNo) != DialogResult.Yes)
             {
                 return;
@@ -554,6 +728,7 @@ namespace HSDRawViewer
             CurrentProjectRelativePath = null;
             FilePath = null;
             RawHSDFile = new HSDRawFile();
+            CurrentA2DPackage = null;
             RefreshTree();
 
             if (_projectExplorer != null && !_projectExplorer.IsDisposed)
@@ -579,6 +754,7 @@ namespace HSDRawViewer
             Project = null;
             FilePath = null;
             RawHSDFile = new HSDRawFile();
+            CurrentA2DPackage = null;
 
             if (_projectExplorer != null && !_projectExplorer.IsDisposed)
             {
@@ -598,6 +774,12 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentA2DPackage != null)
+            {
+                SaveA2DPackageAs();
+                return;
+            }
+
             string projectOutputPath = GetProjectOutputPathForCurrentFile();
             string defaultName = Path.GetFileName(projectOutputPath ?? FilePath);
             string initialDirectory = projectOutputPath == null ? null : Path.GetDirectoryName(projectOutputPath);
@@ -621,6 +803,12 @@ namespace HSDRawViewer
         /// </summary>
         public void SaveDAT()
         {
+            if (CurrentA2DPackage != null)
+            {
+                SaveA2DPackage();
+                return;
+            }
+
             foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is SaveableEditorBase save)
@@ -649,6 +837,12 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (CurrentA2DPackage != null)
+            {
+                SaveA2DPackageAs();
+                return;
+            }
+
             string projectOutputPath = GetProjectOutputPathForCurrentFile();
             string defaultName = Path.GetFileName(projectOutputPath ?? FilePath);
             string initialDirectory = projectOutputPath == null ? null : Path.GetDirectoryName(projectOutputPath);
@@ -679,13 +873,22 @@ namespace HSDRawViewer
             treeView1.BeginUpdate();
 
             treeView1.Nodes.Clear();
-            foreach (HSDRootNode r in RawHSDFile.Roots)
+            if (CurrentA2DPackage != null)
             {
-                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r));
+                A2DPackageNode packageNode = new(CurrentA2DPackage, FilePath);
+                treeView1.Nodes.Add(packageNode);
+                packageNode.Expand();
             }
-            foreach (HSDRootNode r in RawHSDFile.References)
+            else
             {
-                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r, referenceNode: true));
+                foreach (HSDRootNode r in RawHSDFile.Roots)
+                {
+                    treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r));
+                }
+                foreach (HSDRootNode r in RawHSDFile.References)
+                {
+                    treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r, referenceNode: true));
+                }
             }
             if (treeView1.Nodes.Count > 0)
                 treeView1.SelectedNode = treeView1.Nodes[0];
@@ -1010,7 +1213,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
-            if (RawHSDFile.Roots.Count == 0 || MessageBox.Show("Current unsaved changes will be lost", "Open File?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (!HasOpenContent() || MessageBox.Show("Current unsaved changes will be lost", "Open File?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
                 if (s.Length > 0 && Directory.Exists(s[0]))

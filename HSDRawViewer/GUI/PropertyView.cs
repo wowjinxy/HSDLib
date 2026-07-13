@@ -169,6 +169,16 @@ namespace HSDRawViewer.GUI
                 offsetBox.Text = "0";
         }
 
+        public void ClearNode()
+        {
+            Node = null;
+            Poker.accessor = null;
+            propertyGrid1.SelectedObject = null;
+            hexbox.ByteProvider = new DynamicByteProvider(new byte[0]);
+            structSize.Text = "0x0";
+            offsetBox.Text = "0";
+        }
+
         private int selectedLength = 0;
         private int selectedIndex = 0;
 
