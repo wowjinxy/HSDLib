@@ -29,9 +29,13 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public HSD_ShapeAnimJoint ShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x08); set => _s.SetReference(0x08, value); }
 
-        // 0x0C - script
+        public KAR_YakumonoScript Script { get => _s.GetReference<KAR_YakumonoScript>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public int Flags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+    }
+
+    public class KAR_YakumonoScript : HSDRaw.Melee.Cmd.SBM_FighterSubactionData
+    {
     }
 
     public class KAR_YakumonoAudio : HSDAccessor

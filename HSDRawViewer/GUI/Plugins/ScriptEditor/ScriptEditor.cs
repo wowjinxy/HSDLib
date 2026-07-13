@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide;
+using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.AirRide.Rd;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
@@ -32,7 +33,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         typeof(SBM_ItemSubactionData),
         typeof(SBM_ColorSubactionData),
         typeof(KAR_RdScript),
-        typeof(KAR_WpScript) })]
+        typeof(KAR_WpScript),
+        typeof(KAR_YakumonoScript) })]
     public partial class ScriptEditor : SaveableEditorBase, IDrawableInterface
     {
         public override DataNode Node
@@ -54,6 +56,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                     if (value.Accessor is KAR_WpScript)
                         SubactionGroup = SubactionGroup.Weapon;
+
+                    if (value.Accessor is KAR_YakumonoScript)
+                        SubactionGroup = SubactionGroup.Yakumono;
 
                     SBM_FighterAction[] su = new SBM_FighterAction[]
                     {

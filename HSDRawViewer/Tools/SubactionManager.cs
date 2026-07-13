@@ -235,6 +235,17 @@ namespace HSDRawViewer.Tools
         }
         private static List<Subaction> _weaponSubactions;
 
+        public static List<Subaction> YakumonoSubactions
+        {
+            get
+            {
+                if (_yakumonoSubactions == null)
+                    LoadFromFile();
+                return _yakumonoSubactions;
+            }
+        }
+        private static List<Subaction> _yakumonoSubactions;
+
         /// <summary>
         /// 
         /// </summary>
@@ -252,6 +263,7 @@ namespace HSDRawViewer.Tools
             string cisa = "";
             string rsa = "";
             string wsa = "";
+            string ysa = "";
 
             string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_controls.yml");
             string fighterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_fighter.yml");
@@ -262,6 +274,7 @@ namespace HSDRawViewer.Tools
 
             string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_kar_rider.yml");
             string weaponPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_kar_weapon.yml");
+            string yakumonoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_kar_yakumono.yml");
 
             if (File.Exists(controlPath))
                 sa = File.ReadAllText(controlPath);
@@ -287,6 +300,9 @@ namespace HSDRawViewer.Tools
             if (File.Exists(weaponPath))
                 wsa = File.ReadAllText(weaponPath);
 
+            if (File.Exists(yakumonoPath))
+                ysa = File.ReadAllText(yakumonoPath);
+
             Subaction[] subs = deserializer.Deserialize<Subaction[]>(sa);
             Subaction[] fsubs = deserializer.Deserialize<Subaction[]>(fsa);
             Subaction[] isubs = deserializer.Deserialize<Subaction[]>(isa);
@@ -295,6 +311,7 @@ namespace HSDRawViewer.Tools
             Subaction[] customitemsubs = deserializer.Deserialize<Subaction[]>(cisa);
             Subaction[] ridersubs = deserializer.Deserialize<Subaction[]>(rsa);
             Subaction[] weaponsubs = deserializer.Deserialize<Subaction[]>(wsa);
+            Subaction[] yakumonosubs = deserializer.Deserialize<Subaction[]>(ysa);
 
             if (subs != null && subs.Length != 0)
             {
@@ -344,6 +361,15 @@ namespace HSDRawViewer.Tools
                         s.Code <<= 2;
                     _weaponSubactions.AddRange(subs);
                     _weaponSubactions.AddRange(weaponsubs);
+                }
+
+                _yakumonoSubactions = new List<Subaction>();
+                if (yakumonosubs != null && yakumonosubs.Length != 0)
+                {
+                    foreach (Subaction s in yakumonosubs)
+                        s.Code <<= 2;
+                    _yakumonoSubactions.AddRange(subs);
+                    _yakumonoSubactions.AddRange(yakumonosubs);
                 }
             }
 
@@ -406,6 +432,8 @@ namespace HSDRawViewer.Tools
                     return RiderSubactions;
                 case SubactionGroup.Weapon:
                     return WeaponSubactions;
+                case SubactionGroup.Yakumono:
+                    return YakumonoSubactions;
                 default:
                     return FighterSubactions;
             }
