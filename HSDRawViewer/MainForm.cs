@@ -59,7 +59,18 @@ namespace HSDRawViewer
 
         public int GetStructLocation(HSDStruct str)
         {
-            return RawHSDFile.GetOffsetFromStruct(str);
+            int offset = RawHSDFile.GetOffsetFromStruct(str);
+            if (offset != -1)
+                return offset;
+
+            foreach (HSDRawFile archive in EnumerateOpenA2DHSDArchives())
+            {
+                offset = archive.GetOffsetFromStruct(str);
+                if (offset != -1)
+                    return offset;
+            }
+
+            return -1;
         }
 
         public MainForm()
@@ -170,7 +181,7 @@ namespace HSDRawViewer
             {
                 TreeNode clickedNode = treeView1.GetNodeAt(args.Location);
                 treeView1.SelectedNode = clickedNode;
-                if (args.Button == MouseButtons.Right && clickedNode is DataNode node)
+                if (args.Button == MouseButtons.Right && clickedNode is DataNode node && !node.ReadOnlyPreview)
                 {
                     PluginManager.GetContextMenuFromType(node.Accessor.GetType()).Show(this, args.Location);
                 }
@@ -268,8 +279,19 @@ namespace HSDRawViewer
         /// <param name="cast"></param>
         private void SelectCurrentTreeNode()
         {
-            if (treeView1.SelectedNode is DataNode)
+            if (treeView1.SelectedNode is DataNode dataNode)
             {
+                if (dataNode.ReadOnlyPreview)
+                {
+                    SelectedDataNode = null;
+                    _nodePropertyViewer.ClearNode();
+
+                    int offset = GetStructLocation(dataNode.Accessor._s);
+                    string offsetText = offset < 0 ? "unknown" : "0x" + offset.ToString("X8");
+                    LocationLabel.Text = $"A2D HSD Preview: {offsetText} -> {dataNode.FullPath}";
+                    return;
+                }
+
                 SelectNode<HSDAccessor>();
                 return;
             }
@@ -313,7 +335,7 @@ namespace HSDRawViewer
                 }
                 SelectedDataNode = n;
 
-                LocationLabel.Text = "Location: 0x" + RawHSDFile.GetOffsetFromStruct(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
+                LocationLabel.Text = "Location: 0x" + GetStructLocation(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
             }
         }
 
@@ -611,8 +633,21 @@ namespace HSDRawViewer
             if (treeView1.Nodes.Count > 0 && treeView1.Nodes[0] is A2DPackageNode packageNode)
             {
                 packageNode.FilePath = FilePath;
+                packageNode.RefreshEntries();
                 packageNode.UpdateText();
                 packageNode.Expand();
+            }
+        }
+
+        private IEnumerable<HSDRawFile> EnumerateOpenA2DHSDArchives()
+        {
+            foreach (TreeNode root in treeView1.Nodes)
+            {
+                foreach (TreeNode child in root.Nodes)
+                {
+                    if (child is A2DPackageEntryNode entryNode && entryNode.HSDArchive != null)
+                        yield return entryNode.HSDArchive;
+                }
             }
         }
 

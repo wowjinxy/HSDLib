@@ -1,3 +1,5 @@
+using HSDRaw;
+using System;
 using System.IO;
 using System.Windows.Forms;
 
@@ -39,6 +41,10 @@ namespace HSDRawViewer.Tools.AirRide
 
         public A2DPackageEntry Entry { get; }
 
+        public HSDRawFile HSDArchive { get; }
+
+        public string HSDArchiveError { get; }
+
         public A2DPackageEntryNode(A2DPackageNode packageNode, A2DPackageEntry entry)
         {
             PackageNode = packageNode;
@@ -46,6 +52,30 @@ namespace HSDRawViewer.Tools.AirRide
             Text = entry.Name;
             ImageKey = "known";
             SelectedImageKey = "known";
+
+            if (PackageNode.Package.TryGetEntryHSDArchiveData(entry.Index, out byte[] archiveData, out string error))
+            {
+                try
+                {
+                    HSDArchive = new HSDRawFile(archiveData);
+                    ImageKey = "folder";
+                    SelectedImageKey = "folder";
+
+                    foreach (HSDRootNode root in HSDArchive.Roots)
+                        Nodes.Add(new DataNode(root.Name, root.Data, root: root, readOnlyPreview: true));
+
+                    foreach (HSDRootNode root in HSDArchive.References)
+                        Nodes.Add(new DataNode(root.Name, root.Data, root: root, referenceNode: true, readOnlyPreview: true));
+                }
+                catch (Exception ex) when (ex is InvalidDataException || ex is EndOfStreamException || ex is ArgumentOutOfRangeException)
+                {
+                    HSDArchiveError = ex.Message;
+                }
+            }
+            else
+            {
+                HSDArchiveError = error;
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ namespace HSDRawViewer
         public string RootText { set { Root.Name = value; } }
         public bool IsRootNode { get => Root != null; }
         public bool IsReferenceNode { get => ReferenceNode; }
+        public bool ReadOnlyPreview { get; }
 
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
@@ -32,7 +33,8 @@ namespace HSDRawViewer
         {
             get
             {
-                return (Parent != null ? ((DataNode)Parent).StructPath : "") + MainForm.Instance.GetStructLocation(Accessor._s) + ": " + Text;
+                string parentPath = Parent is DataNode parent ? parent.StructPath : Parent != null ? Parent.Text + "/" : "";
+                return parentPath + MainForm.Instance.GetStructLocation(Accessor._s) + ": " + Text;
             }
         }
 
@@ -151,10 +153,11 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="Text"></param>
         /// <param name="accessor"></param>
-        public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false, HSDRootNode root = null)
+        public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false, HSDRootNode root = null, bool readOnlyPreview = false)
         {
             Accessor = accessor;
             ReferenceNode = referenceNode;
+            ReadOnlyPreview = readOnlyPreview;
             this.Text = Text;
             Root = root;
 
@@ -180,7 +183,7 @@ namespace HSDRawViewer
                     HSDAccessor acc = (HSDAccessor)prop.GetValue(access);
                     if (acc != null)
                     {
-                        DataNode node = new(name + "_" + index, acc);
+                        DataNode node = new(name + "_" + index, acc, readOnlyPreview: ReadOnlyPreview);
                         nodes.Add(node);
                         AddNext(name, acc, index + 1, nodes);
                     }
@@ -240,7 +243,7 @@ namespace HSDRawViewer
                             if (!labeledNodes.ContainsKey(a._s))
                                 labeledNodes.Add(a._s, null);
 
-                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"[{index}]: ({prop.PropertyType.Name})"), a)
+                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"[{index}]: ({prop.PropertyType.Name})"), a, readOnlyPreview: ReadOnlyPreview)
                             {
                                 IsArrayMember = true,
                                 ArrayName = prop.Name,
@@ -283,7 +286,7 @@ namespace HSDRawViewer
                     {
                         if (prop.Name != "Next")
                         {
-                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_({prop.PropertyType.Name})"), acc);
+                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_({prop.PropertyType.Name})"), acc, readOnlyPreview: ReadOnlyPreview);
 
                             List<DataNode> nodes = new();
                             nodes.Add(node);
@@ -304,7 +307,7 @@ namespace HSDRawViewer
             {
                 if (!labeledNodes.ContainsKey(v.Value))
                 {
-                    DataNode node = new("0x" + v.Key.ToString("X6"), Accessor._s.GetReference<HSDAccessor>(v.Key));
+                    DataNode node = new("0x" + v.Key.ToString("X6"), Accessor._s.GetReference<HSDAccessor>(v.Key), readOnlyPreview: ReadOnlyPreview);
                     SafeExpand(node);
                 }
                 else
@@ -402,6 +405,12 @@ namespace HSDRawViewer
         /// <returns>return true is success</returns>
         private bool CanEdit()
         {
+            if (ReadOnlyPreview)
+            {
+                MessageBox.Show("This node is a read-only preview of an A2D resource. Export or replace the whole resource from the package entry.", "Read-Only A2D Preview", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return false;
+            }
+
             if (MainForm.Instance.IsOpened(this))
             {
                 if (MessageBox.Show("Node is open in editor\nClose Editor?", "Error", MessageBoxButtons.YesNo) == DialogResult.Yes)

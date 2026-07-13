@@ -56,6 +56,41 @@ namespace HSDRawViewer.Tools.AirRide
             return output;
         }
 
+        public bool TryGetEntryHSDArchiveData(int index, out byte[] archiveData, out string error)
+        {
+            archiveData = null;
+            error = null;
+
+            if (index < 0 || index >= _entries.Count)
+            {
+                error = "No resource is selected.";
+                return false;
+            }
+
+            A2DPackageEntry entry = _entries[index];
+            if (entry.Size < 0x24)
+            {
+                error = "Resource is too small to contain a wrapped HSD archive.";
+                return false;
+            }
+
+            int archiveOffset = entry.DataOffset + 4;
+            int availableSize = entry.Size - 4;
+            if (!TryReadHSDArchiveHeader(archiveOffset, availableSize, out int archiveSize, out error))
+                return false;
+
+            uint wrapperSize = ReadUInt32(Data, entry.DataOffset);
+            if (wrapperSize != archiveSize)
+            {
+                error = "Resource wrapper size does not match the inner HSD archive size.";
+                return false;
+            }
+
+            archiveData = new byte[archiveSize];
+            Buffer.BlockCopy(Data, archiveOffset, archiveData, 0, archiveData.Length);
+            return true;
+        }
+
         public bool ReplaceEntry(int index, string replacementPath, out string error)
         {
             error = null;
@@ -193,6 +228,48 @@ namespace HSDRawViewer.Tools.AirRide
                 return false;
 
             checkedOffset = (int)offset;
+            return true;
+        }
+
+        private bool TryReadHSDArchiveHeader(int offset, int availableSize, out int archiveSize, out string error)
+        {
+            archiveSize = 0;
+            error = null;
+
+            if (offset < 0 || availableSize < 0x20 || offset + availableSize > Data.Length)
+            {
+                error = "Resource is too small to contain an HSD archive header.";
+                return false;
+            }
+
+            uint rawArchiveSize = ReadUInt32(Data, offset);
+            uint rawDataSize = ReadUInt32(Data, offset + 4);
+            uint rawRelocCount = ReadUInt32(Data, offset + 8);
+            uint rawRootCount = ReadUInt32(Data, offset + 12);
+            uint rawRefCount = ReadUInt32(Data, offset + 16);
+
+            if (rawArchiveSize < 0x20 || rawArchiveSize > availableSize || rawArchiveSize > int.MaxValue)
+            {
+                error = "Inner HSD archive size is invalid.";
+                return false;
+            }
+
+            archiveSize = (int)rawArchiveSize;
+            if (rawDataSize + 0x20UL > (ulong)archiveSize)
+            {
+                error = "Inner HSD archive data section extends past the archive size.";
+                return false;
+            }
+
+            ulong relocOffset = rawDataSize + 0x20UL;
+            ulong rootTableOffset = relocOffset + rawRelocCount * 4UL;
+            ulong stringStart = rootTableOffset + (rawRootCount + rawRefCount) * 8UL;
+            if (rootTableOffset > (ulong)archiveSize || stringStart > (ulong)archiveSize)
+            {
+                error = "Inner HSD archive relocation/root tables extend past the archive size.";
+                return false;
+            }
+
             return true;
         }
 
