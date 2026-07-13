@@ -85,7 +85,8 @@ namespace HSDRawViewer.ContextMenus.AirRide
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
                     string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelPath = MainForm.Instance.ResolveProjectFile(modelFileName) ??
+                        FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {
@@ -125,7 +126,8 @@ namespace HSDRawViewer.ContextMenus.AirRide
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
                     string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelPath = MainForm.Instance.ResolveProjectFile(modelFileName) ??
+                        FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {

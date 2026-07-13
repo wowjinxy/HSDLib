@@ -8,6 +8,7 @@ using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.GUI.Plugins;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.AirRide;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -268,11 +269,27 @@ namespace HSDRawViewer
 
         private void OpenFile(string readPath, string projectRelativePath)
         {
+            if (TryOpenA2DPackage(readPath, projectRelativePath))
+                return;
+
+            HSDRawFile openedFile = new();
+            try
+            {
+                openedFile.Open(readPath);
+            }
+            catch (Exception ex) when (ex is InvalidDataException || ex is EndOfStreamException || ex is ArgumentOutOfRangeException)
+            {
+                MessageBox.Show(
+                    $"Could not open this file as an HSD archive.\n\n{ex.Message}",
+                    "Unsupported DAT File",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
             CurrentProjectRelativePath = projectRelativePath;
             FilePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
-
-            RawHSDFile = new HSDRawFile();
-            RawHSDFile.Open(readPath);
+            RawHSDFile = openedFile;
             RefreshTree();
 
 #if !DEBUG
@@ -293,6 +310,19 @@ namespace HSDRawViewer
 #endif
 
             UpdateWindowTitle(readPath);
+        }
+
+        private bool TryOpenA2DPackage(string readPath, string projectRelativePath)
+        {
+            if (!A2DPackage.IsA2DPackage(readPath))
+                return false;
+
+            string savePath = projectRelativePath == null ? readPath : Project.GetSourcePath(projectRelativePath);
+            A2DPackageTool d = new();
+            d.Show();
+            d.OpenPackage(readPath, savePath);
+            d.BringToFront();
+            return true;
         }
 
         public void OpenProjectFile(string relativePath)

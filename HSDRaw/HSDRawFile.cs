@@ -109,18 +109,40 @@ namespace HSDRaw
             using (BinaryReaderExt r = new BinaryReaderExt(stream))
             {
                 r.BigEndian = true;
+                Roots.Clear();
+                References.Clear();
+                _structCache.Clear();
+                _structCacheToOffset.Clear();
 
                 Stopwatch sw = new Stopwatch();
 
                 sw.Start();
 
                 // Parse Header -----------------------------
+                if (r.BaseStream.Length < 0x20)
+                    throw new InvalidDataException("File is too small to be an HSD archive.");
+
                 var fsize = r.ReadInt32(); // dat size
-                int relocOffset = r.ReadInt32() + 0x20;
+                int dataSize = r.ReadInt32();
                 int relocCount = r.ReadInt32();
                 int rootCount = r.ReadInt32();
                 int refCount = r.ReadInt32();
                 VersionChars = r.ReadChars(4);
+
+                if (fsize != r.BaseStream.Length)
+                    throw new InvalidDataException("File is not a valid HSD archive: header file size does not match the stream length.");
+
+                if (dataSize < 0 || dataSize + 0x20L > fsize)
+                    throw new InvalidDataException("File is not a valid HSD archive: data section extends past the end of the file.");
+
+                if (relocCount < 0 || rootCount < 0 || refCount < 0)
+                    throw new InvalidDataException("File is not a valid HSD archive: table counts must be non-negative.");
+
+                int relocOffset = dataSize + 0x20;
+                long rootTableOffset = relocOffset + relocCount * 4L;
+                long stringStart = rootTableOffset + (rootCount + refCount) * 8L;
+                if (rootTableOffset > fsize || stringStart > fsize)
+                    throw new InvalidDataException("File is not a valid HSD archive: relocation/root tables extend past the end of the file.");
                 
                 // Parse Relocation Table -----------------------------
                 List<int> Offsets = new List<int>();
@@ -130,12 +152,18 @@ namespace HSDRaw
 
                 for (int i = 0; i < relocCount; i++)
                 {
-                    r.BaseStream.Position = relocOffset + 4 * i;
-                    int offset = r.ReadInt32() + 0x20;
+                    long relocationEntryOffset = relocOffset + 4L * i;
+                    EnsureCanRead(relocationEntryOffset, 4, fsize, "relocation entry");
+                    r.BaseStream.Position = relocationEntryOffset;
+
+                    int offsetRaw = r.ReadInt32();
+                    long offsetLong = offsetRaw + 0x20L;
+                    EnsureCanRead(offsetLong, 4, fsize, "relocated pointer");
+                    int offset = (int)offsetLong;
 
                     r.BaseStream.Position = offset;
 
-                    var objectOff = r.ReadInt32() + 0x20;
+                    int objectOffRaw = r.ReadInt32();
 
                     //if (objectOff % 4 != 0)
                     //{
@@ -144,14 +172,20 @@ namespace HSDRaw
                     //    continue;
                     //}
 
+                    // alternate null pointer
+                    if (objectOffRaw < 0)
+                        continue;
+
+                    long objectOffLong = objectOffRaw + 0x20L;
+                    if (objectOffLong < 0x20 || objectOffLong > fsize)
+                        throw new InvalidDataException("File is not a valid HSD archive: relocated object points outside the file.");
+
+                    int objectOff = (int)objectOffLong;
+
                     // if we need to read past end of file then we need to include filesize as an offset
                     // this fixes files that had previously been manually relocated to end of file
                     if(objectOff > relocOffset && !OffsetContain.Contains(fsize))
                         Offsets.Add(fsize);
-
-                    // alternate null pointer
-                    if (objectOff < 0)
-                        continue;
 
                     relocOffsets.Add(offset, objectOff);
 
@@ -171,35 +205,39 @@ namespace HSDRaw
                 sw.Restart();
 
                 // Parse Roots---------------------------------
-                r.BaseStream.Position = relocOffset + relocCount * 4;
+                r.BaseStream.Position = rootTableOffset;
                 List<int> rootOffsets = new List<int>();
                 List<string> rootStrings = new List<string>();
                 List<int> refOffsets = new List<int>();
                 List<string> refStrings = new List<string>();
-                var stringStart = r.BaseStream.Position + (refCount + rootCount) * 8;
                 for (int i = 0; i < rootCount; i++)
                 {
-                    rootOffsets.Add(r.ReadInt32() + 0x20);
-                    rootStrings.Add(r.ReadString((int)stringStart + r.ReadInt32(), -1));
+                    int rootOffsetRaw = r.ReadInt32();
+                    int stringOffset = r.ReadInt32();
+                    rootOffsets.Add(ValidateDataOffset(rootOffsetRaw, fsize, "root"));
+                    rootStrings.Add(ReadArchiveString(r, stringStart, stringOffset, fsize, "root"));
                 }
                 for (int i = 0; i < refCount; i++)
                 {
-                    var refp = r.ReadInt32() + 0x20;
+                    int refOffsetRaw = r.ReadInt32();
+                    int stringOffset = r.ReadInt32();
+                    var refp = ValidateDataOffset(refOffsetRaw, fsize, "reference");
                     refOffsets.Add(refp);
-                    refStrings.Add(r.ReadString((int)stringStart + r.ReadInt32(), -1));
+                    refStrings.Add(ReadArchiveString(r, stringStart, stringOffset, fsize, "reference"));
 
                     var temp = r.Position;
 
                     var special = refp;
                     while (true)
                     {
+                        EnsureCanRead(special, 4, fsize, "external reference chain");
                         r.Seek((uint)special);
-                        special = r.ReadInt32();
+                        int specialRaw = r.ReadInt32();
 
-                        if (special == 0 || special == -1 )
+                        if (specialRaw == 0 || specialRaw == -1 )
                             break;
 
-                        special += 0x20;
+                        special = ValidateDataOffset(specialRaw, fsize, "external reference chain");
 
                         relocOffsets.Add(refp, special);
 
@@ -395,6 +433,30 @@ namespace HSDRaw
             }
 
             return null;
+        }
+
+        private static void EnsureCanRead(long offset, int size, long fileSize, string tableName)
+        {
+            if (offset < 0 || offset + size > fileSize)
+                throw new InvalidDataException($"File is not a valid HSD archive: {tableName} points outside the file.");
+        }
+
+        private static int ValidateDataOffset(int rawOffset, long fileSize, string tableName)
+        {
+            long offset = rawOffset + 0x20L;
+            if (offset < 0x20 || offset > fileSize)
+                throw new InvalidDataException($"File is not a valid HSD archive: {tableName} offset points outside the file.");
+
+            return (int)offset;
+        }
+
+        private static string ReadArchiveString(BinaryReaderExt reader, long stringStart, int stringOffset, long fileSize, string tableName)
+        {
+            long offset = stringStart + stringOffset;
+            if (offset < stringStart || offset >= fileSize)
+                throw new InvalidDataException($"File is not a valid HSD archive: {tableName} symbol points outside the string table.");
+
+            return reader.ReadString((int)offset, -1);
         }
 
         /// <summary>
