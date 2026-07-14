@@ -143,7 +143,14 @@ namespace HSDRawViewer.GUI
         {
             string status = _project.HasOutputOverride(file.RelativePath) ? "Modified in output" : "Source";
             string openHint = _project.IsSupportedOpenFile(file.RelativePath) ? "Double-click to open" : "No viewer registered for this file";
-            return $"{file.Kind}: {file.RelativePath}\n{status}\n{openHint}";
+            string roots = file.ArchiveDefinition.Roots.Count == 0
+                ? null
+                : "Expected roots: " + string.Join(", ", file.ArchiveDefinition.Roots.Select(root => root.Pattern));
+
+            if (roots == null)
+                return $"{file.DisplayName}\n{file.Kind}: {file.RelativePath}\n{status}\n{openHint}";
+
+            return $"{file.DisplayName}\n{file.Kind}: {file.RelativePath}\n{roots}\n{status}\n{openHint}";
         }
 
         private void OpenSelectedFile()

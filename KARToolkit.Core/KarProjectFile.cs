@@ -10,6 +10,7 @@ namespace KARToolkit.Core
             SourcePath = sourcePath;
             OutputPath = outputPath;
             Kind = kind;
+            ArchiveDefinition = KarArchiveCatalog.GetDefinition(relativePath, kind);
         }
 
         public string RelativePath { get; }
@@ -19,6 +20,12 @@ namespace KARToolkit.Core
         public string OutputPath { get; }
 
         public KarFileKind Kind { get; }
+
+        public KarArchiveDefinition ArchiveDefinition { get; }
+
+        public string DisplayName => ArchiveDefinition.DisplayName;
+
+        public string Category => ArchiveDefinition.Category;
 
         public bool HasOutputCopy => File.Exists(OutputPath);
 
