@@ -10,6 +10,7 @@ namespace KARToolkit.Core
     public sealed class KarProject
     {
         private readonly Dictionary<string, KarProjectFile> _filesByPath;
+        private readonly Dictionary<string, KarMapBundle> _mapsByName;
 
         private KarProject(
             string sourceRoot,
@@ -28,9 +29,12 @@ namespace KARToolkit.Core
             Files = files;
             Maps = maps;
             _filesByPath = files.ToDictionary(f => f.RelativePath, StringComparer.OrdinalIgnoreCase);
+            _mapsByName = maps.ToDictionary(map => map.Name, StringComparer.OrdinalIgnoreCase);
         }
 
         public string SourceRoot { get; }
+
+        public string Name => Path.GetFileName(SourceRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
         public string SourceFilesRoot { get; }
 
@@ -45,6 +49,8 @@ namespace KARToolkit.Core
         public IReadOnlyList<KarMapBundle> Maps { get; }
 
         public IReadOnlyDictionary<string, KarProjectFile> FilesByPath => _filesByPath;
+
+        public IReadOnlyDictionary<string, KarMapBundle> MapsByName => _mapsByName;
 
         public static KarProject Open(string sourceRoot)
         {
@@ -101,6 +107,25 @@ namespace KARToolkit.Core
             return _filesByPath.TryGetValue(normalized, out file);
         }
 
+        public KarMapBundle GetMap(string mapNameOrPath)
+        {
+            KarMapBundle map;
+            if (!TryGetMap(mapNameOrPath, out map))
+                throw new KeyNotFoundException("Project map was not found: " + mapNameOrPath);
+
+            return map;
+        }
+
+        public bool TryGetMap(string mapNameOrPath, out KarMapBundle map)
+        {
+            map = null;
+            if (string.IsNullOrWhiteSpace(mapNameOrPath))
+                return false;
+
+            string normalized = NormalizeMapName(mapNameOrPath);
+            return _mapsByName.TryGetValue(normalized, out map);
+        }
+
         public string GetReadPath(string relativePath)
         {
             return GetFile(relativePath).ReadPath;
@@ -125,6 +150,22 @@ namespace KARToolkit.Core
                 File.Copy(file.SourcePath, outputPath, overwrite);
 
             return outputPath;
+        }
+
+        public IReadOnlyList<string> CopyMapToOutput(string mapNameOrPath, bool overwrite = false)
+        {
+            return CopyMapToOutput(GetMap(mapNameOrPath), overwrite);
+        }
+
+        public IReadOnlyList<string> CopyMapToOutput(KarMapBundle map, bool overwrite = false)
+        {
+            if (map == null)
+                throw new ArgumentNullException(nameof(map));
+
+            return map.Files
+                .Select(file => CopyToOutput(file.RelativePath, overwrite))
+                .ToList()
+                .AsReadOnly();
         }
 
         public byte[] ReadBytes(string relativePath)
@@ -170,6 +211,44 @@ namespace KARToolkit.Core
                 error = ex.Message;
                 return false;
             }
+        }
+
+        public KarMapInfo InspectMap(string mapNameOrPath)
+        {
+            return InspectMap(GetMap(mapNameOrPath));
+        }
+
+        public KarMapInfo InspectMap(KarMapBundle map)
+        {
+            if (map == null)
+                throw new ArgumentNullException(nameof(map));
+
+            return new KarMapInfo(
+                map,
+                InspectOptionalArchive(map.DataFile),
+                InspectOptionalArchive(map.ModelFile),
+                InspectOptionalArchive(map.EventFile));
+        }
+
+        public bool TryInspectMap(string mapNameOrPath, out KarMapInfo info, out string error)
+        {
+            try
+            {
+                info = InspectMap(mapNameOrPath);
+                error = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                error = ex.Message;
+                return false;
+            }
+        }
+
+        public KarValidationReport Validate(KarValidationOptions options = null)
+        {
+            return new KarProjectValidator(this, options).Validate();
         }
 
         public bool TryOpenA2DPackage(string relativePath, out A2DPackage package, out string error)
@@ -290,6 +369,14 @@ namespace KARToolkit.Core
             return KarArchiveCatalog.TryGetMapName(file.RelativePath, file.Kind, out mapName);
         }
 
+        private KarArchiveInfo InspectOptionalArchive(KarProjectFile file)
+        {
+            if (file == null)
+                return null;
+
+            return InspectHsdArchive(file.RelativePath);
+        }
+
         private string PrepareOutputPath(string relativePath)
         {
             var outputPath = ResolveUnderRoot(OutputFilesRoot, relativePath);
@@ -327,6 +414,23 @@ namespace KARToolkit.Core
             }
 
             return string.Join("/", parts);
+        }
+
+        private static string NormalizeMapName(string mapNameOrPath)
+        {
+            string name = Path.GetFileNameWithoutExtension(mapNameOrPath.Trim());
+            if (string.IsNullOrWhiteSpace(name))
+                return name;
+
+            if (name.StartsWith("Gr", StringComparison.OrdinalIgnoreCase))
+                name = name.Substring(2);
+
+            if (name.EndsWith("Model", StringComparison.OrdinalIgnoreCase))
+                name = name.Substring(0, name.Length - "Model".Length);
+            else if (name.EndsWith("Event", StringComparison.OrdinalIgnoreCase))
+                name = name.Substring(0, name.Length - "Event".Length);
+
+            return name;
         }
 
         private static string ResolveUnderRoot(string root, string relativePath)

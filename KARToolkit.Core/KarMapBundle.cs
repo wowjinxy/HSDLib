@@ -29,6 +29,16 @@ namespace KARToolkit.Core
 
         public KarProjectFile EventFile { get; }
 
+        public KarProjectFile ScriptFile => EventFile;
+
         public IReadOnlyList<KarProjectFile> Files { get; }
+
+        public bool HasDataFile => DataFile != null;
+
+        public bool HasModelFile => ModelFile != null;
+
+        public bool HasEventFile => EventFile != null;
+
+        public bool HasScriptFile => ScriptFile != null;
     }
 }

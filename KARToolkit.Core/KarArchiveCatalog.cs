@@ -25,6 +25,8 @@ namespace KARToolkit.Core
 
             if (fileName.Equals("Stage.dat", StringComparison.OrdinalIgnoreCase))
                 return KarFileKind.StageTable;
+            if (name.StartsWith("A2Ef", StringComparison.OrdinalIgnoreCase))
+                return KarFileKind.EffectData;
             if (name.StartsWith("A2", StringComparison.OrdinalIgnoreCase))
                 return KarFileKind.A2dPackage;
             if (name.Equals("GrCommon", StringComparison.OrdinalIgnoreCase))
@@ -63,6 +65,29 @@ namespace KARToolkit.Core
         public static KarArchiveDefinition GetDefinition(string relativePath)
         {
             return GetDefinition(relativePath, ClassifyKind(relativePath));
+        }
+
+        public static bool IsHsdArchiveKind(KarFileKind kind)
+        {
+            switch (kind)
+            {
+                case KarFileKind.HsdArchive:
+                case KarFileKind.MapData:
+                case KarFileKind.MapModel:
+                case KarFileKind.MapEvent:
+                case KarFileKind.MapCommon:
+                case KarFileKind.StageTable:
+                case KarFileKind.RiderData:
+                case KarFileKind.VehicleData:
+                case KarFileKind.EffectData:
+                case KarFileKind.ItemData:
+                case KarFileKind.EnemyData:
+                case KarFileKind.UiData:
+                case KarFileKind.VersusData:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         public static KarArchiveDefinition GetDefinition(string relativePath, KarFileKind kind)
@@ -204,6 +229,12 @@ namespace KARToolkit.Core
         {
             if (name.Equals("RdCommon", StringComparison.OrdinalIgnoreCase))
                 return Define(kind, "Rider Common Data", "Riders", "Shared rider data.", Root("rdDataCommon", "Shared rider data", "KAR_RdDataCommon"));
+            if (name.StartsWith("Rd", StringComparison.OrdinalIgnoreCase) &&
+                name.IndexOf("Motion", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                string motionName = ToRiderMotionName(StripPrefix(name, "Rd"));
+                return Define(kind, "Rider Motion: " + motionName, "Riders", "Rider motion table.", Root("rdMotion" + motionName, "Rider motion table", "HSDArrayAccessor<KAR_RdMotion>"));
+            }
 
             return Define(kind, "Rider Data: " + StripPrefix(name, "Rd"), "Riders", "Rider data and rider animation resources.", Root("rdData" + StripPrefix(name, "Rd"), "Rider data", "KAR_RdData"), KarRootDefinition.Suffix("_cmpatree", "Rider animation tree", "HSD_FigaTree", false));
         }
@@ -263,6 +294,17 @@ namespace KARToolkit.Core
                 return value;
 
             return char.ToLowerInvariant(value[0]) + value.Substring(1);
+        }
+
+        private static string ToRiderMotionName(string value)
+        {
+            int motionIndex = value.IndexOf("Motion", StringComparison.OrdinalIgnoreCase);
+            if (motionIndex < 0)
+                return value;
+
+            string before = value.Substring(0, motionIndex);
+            string after = value.Substring(motionIndex + "Motion".Length);
+            return before + after;
         }
     }
 }

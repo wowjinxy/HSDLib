@@ -18,6 +18,14 @@ namespace KARToolkit.Core
                 .Where(expected => !Roots.Any(actual => expected.Matches(actual.Name)))
                 .ToList()
                 .AsReadOnly();
+            KnownRoots = Roots
+                .Where(root => root.IsKnown)
+                .ToList()
+                .AsReadOnly();
+            UnknownRoots = Roots
+                .Where(root => !root.IsKnown)
+                .ToList()
+                .AsReadOnly();
         }
 
         public KarProjectFile File { get; }
@@ -26,6 +34,12 @@ namespace KARToolkit.Core
 
         public IReadOnlyList<KarArchiveRootInfo> Roots { get; }
 
+        public IReadOnlyList<KarArchiveRootInfo> KnownRoots { get; }
+
+        public IReadOnlyList<KarArchiveRootInfo> UnknownRoots { get; }
+
         public IReadOnlyList<KarRootDefinition> MissingRequiredRoots { get; }
+
+        public bool HasMissingRequiredRoots => MissingRequiredRoots.Count != 0;
     }
 }

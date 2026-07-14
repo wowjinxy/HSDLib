@@ -16,5 +16,18 @@ namespace KARToolkit.Core
         public KarRootDefinition Definition { get; }
 
         public bool IsKnown => Definition != null;
+
+        public string ExpectedAccessorTypeName => Definition == null ? null : Definition.AccessorTypeName;
+
+        public string DisplayAccessorTypeName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(ExpectedAccessorTypeName))
+                    return ExpectedAccessorTypeName;
+
+                return AccessorTypeName;
+            }
+        }
     }
 }
