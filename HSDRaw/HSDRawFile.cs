@@ -885,8 +885,11 @@ namespace HSDRaw
                 x => x.StartsWith("map_plit") ?  new HSDNullPointerArrayAccessor<HSD_Light>() : null,
                 x => x.StartsWith("map_head") ?  new SBM_Map_Head() : null,
                 x => x.StartsWith("grGroundParam") ?  new SBM_GroundParam() : null,
+                x => x.Equals("vcDataKindStar") ?  new KAR_vcDataKindStar() : null,
+                x => x.Equals("vcDataKindWheel") ?  new KAR_vcDataKindWheel() : null,
                 x => x.StartsWith("vcDataStar") ?  new KAR_vcDataStar() : null,
                 x => x.StartsWith("vcDataWheel") ?  new KAR_vcDataWheel() : null,
+                x => x.Equals("vsDataHydra") || x.Equals("vsDataDragoon") ?  new KAR_vsLegendaryData() : null,
                 x => x.StartsWith("grModelMotion") ?  new HSDArrayAccessor<KAR_grModelMotion>() : null,
                 x => x.StartsWith("grModel") ?  new KAR_grModel() : null,
                 x => x.StartsWith("grDataCommon") ?  new KAR_grDataCommon() : null,
@@ -919,7 +922,7 @@ namespace HSDRaw
                 x => x.Equals("stData") ?  new KAR_stData() : null,
                 x => x.StartsWith("rdMotion") ?  new HSDArrayAccessor<KAR_RdMotion>() : null,
                 x => x.StartsWith("vcDataCommon") ?  new KAR_vcDataCommon() : null,
-                x => x.StartsWith("rdDataCommon") ?  new HSDAccessor() : null, // TODO:
+                x => x.StartsWith("rdDataCommon") ?  new KAR_RdDataCommon() : null,
                 x => x.StartsWith("rdData") ?  new KAR_RdData() : null,
                 x => x.StartsWith("rdExt") ?  new KEX_RdExt() : null,
                 x => x.StartsWith("kexData") ?  new kexData() : null,
@@ -948,7 +951,6 @@ namespace HSDRaw
                 x => x.EndsWith("allstar_fighters") ?  new HSDArrayAccessor<MEX_AllStarFigther>() : null,
                 x => x.EndsWith("hud_colors") ?  new HSDNullPointerArrayAccessor<KAR_HudColor>() : null,
                 x => x.EndsWith("_dynamics") ?  new SBM_PhysicsGroup() : null,
-                x => x.EndsWith("rdDataCommon") ?  new KAR_RdDataCommon() : null,
                 x => x.StartsWith("dbEffectData") ?  new KAR_dbEffectData() : null,
                 x => new HSDAccessor(),
         };
