@@ -9,6 +9,7 @@ using HSDRawViewer.GUI.Plugins;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
+using KARToolkit.Core.AirRide;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

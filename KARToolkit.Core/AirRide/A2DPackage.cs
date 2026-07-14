@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace HSDRawViewer.Tools.AirRide
+namespace KARToolkit.Core.AirRide
 {
     public class A2DPackage
     {
-        private readonly List<A2DPackageEntry> _entries = new();
+        private readonly List<A2DPackageEntry> _entries;
 
         public string FilePath { get; }
 
@@ -46,6 +46,11 @@ namespace HSDRawViewer.Tools.AirRide
 
             byte[] data = File.ReadAllBytes(filePath);
             return TryParse(filePath, data, out package, out error);
+        }
+
+        public static bool TryParse(byte[] data, out A2DPackage package, out string error)
+        {
+            return TryParse(null, data, out package, out error);
         }
 
         public byte[] GetEntryData(int index)
@@ -95,23 +100,35 @@ namespace HSDRawViewer.Tools.AirRide
         {
             error = null;
 
-            if (index < 0 || index >= _entries.Count)
-            {
-                error = "No resource is selected.";
-                return false;
-            }
-
             if (string.IsNullOrEmpty(replacementPath) || !File.Exists(replacementPath))
             {
                 error = "Replacement file does not exist.";
                 return false;
             }
 
+            return ReplaceEntry(index, File.ReadAllBytes(replacementPath), out error);
+        }
+
+        public bool ReplaceEntry(int index, byte[] replacement, out string error)
+        {
+            error = null;
+
+            if (index < 0 || index >= _entries.Count)
+            {
+                error = "No resource is selected.";
+                return false;
+            }
+
+            if (replacement == null)
+            {
+                error = "Replacement data is empty.";
+                return false;
+            }
+
             A2DPackageEntry entry = _entries[index];
-            byte[] replacement = File.ReadAllBytes(replacementPath);
             if (replacement.Length != entry.Size)
             {
-                error = $"Replacement must be exactly 0x{entry.Size:X} bytes. The selected file is 0x{replacement.Length:X} bytes.";
+                error = $"Replacement must be exactly 0x{entry.Size:X} bytes. The selected data is 0x{replacement.Length:X} bytes.";
                 return false;
             }
 
@@ -122,6 +139,10 @@ namespace HSDRawViewer.Tools.AirRide
 
         public void Save(string filePath)
         {
+            string directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
             File.WriteAllBytes(filePath, Data);
             Modified = false;
         }
@@ -131,7 +152,7 @@ namespace HSDRawViewer.Tools.AirRide
             package = null;
             error = null;
 
-            if (data.Length < 0x10)
+            if (data == null || data.Length < 0x10)
             {
                 error = "File is too small to be an A2D package.";
                 return false;
@@ -160,7 +181,7 @@ namespace HSDRawViewer.Tools.AirRide
                 return false;
             }
 
-            List<RawEntry> rawEntries = new();
+            List<RawEntry> rawEntries = new List<RawEntry>();
             for (int i = 0; i < count; i++)
             {
                 int pairOffset = 8 + i * 8;
@@ -188,7 +209,7 @@ namespace HSDRawViewer.Tools.AirRide
             }
 
             int firstDataOffset = rawEntries[0].DataOffset;
-            List<A2DPackageEntry> entries = new();
+            List<A2DPackageEntry> entries = new List<A2DPackageEntry>();
             for (int i = 0; i < rawEntries.Count; i++)
             {
                 RawEntry raw = rawEntries[i];

@@ -1,4 +1,5 @@
 using HSDRaw;
+using KARToolkit.Core.AirRide;
 using System;
 using System.IO;
 using System.Windows.Forms;

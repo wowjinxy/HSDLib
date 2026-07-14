@@ -207,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HSDRaw\HSDRaw.csproj" />
+    <ProjectReference Include="..\KARToolkit.Core\KARToolkit.Core.csproj" />
   </ItemGroup>
 
 </Project>
